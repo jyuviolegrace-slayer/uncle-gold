@@ -1,0 +1,85 @@
+{
+  "types": ["Fire", "Water", "Grass", "Electric", "Psychic", "Ground", "Dark", "Fairy"],
+  "matrix": {
+    "Fire": {
+      "Fire": 0.5,
+      "Water": 0.5,
+      "Grass": 2,
+      "Electric": 1,
+      "Psychic": 1,
+      "Ground": 1,
+      "Dark": 1,
+      "Fairy": 1
+    },
+    "Water": {
+      "Fire": 2,
+      "Water": 0.5,
+      "Grass": 0.5,
+      "Electric": 1,
+      "Psychic": 1,
+      "Ground": 2,
+      "Dark": 1,
+      "Fairy": 1
+    },
+    "Grass": {
+      "Fire": 0.5,
+      "Water": 2,
+      "Grass": 0.5,
+      "Electric": 1,
+      "Psychic": 1,
+      "Ground": 2,
+      "Dark": 1,
+      "Fairy": 1
+    },
+    "Electric": {
+      "Fire": 1,
+      "Water": 2,
+      "Grass": 0.5,
+      "Electric": 0.5,
+      "Psychic": 1,
+      "Ground": 0,
+      "Dark": 1,
+      "Fairy": 1
+    },
+    "Psychic": {
+      "Fire": 1,
+      "Water": 1,
+      "Grass": 1,
+      "Electric": 1,
+      "Psychic": 0.5,
+      "Ground": 1,
+      "Dark": 0,
+      "Fairy": 1
+    },
+    "Ground": {
+      "Fire": 1,
+      "Water": 1,
+      "Grass": 0.5,
+      "Electric": 2,
+      "Psychic": 1,
+      "Ground": 1,
+      "Dark": 1,
+      "Fairy": 1
+    },
+    "Dark": {
+      "Fire": 1,
+      "Water": 1,
+      "Grass": 1,
+      "Electric": 1,
+      "Psychic": 2,
+      "Ground": 1,
+      "Dark": 0.5,
+      "Fairy": 0.5
+    },
+    "Fairy": {
+      "Fire": 0.5,
+      "Water": 1,
+      "Grass": 1,
+      "Electric": 1,
+      "Psychic": 1,
+      "Ground": 1,
+      "Dark": 2,
+      "Fairy": 1
+    }
+  }
+}

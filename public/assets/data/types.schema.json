@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Type Effectiveness Matrix Schema",
+  "type": "object",
+  "properties": {
+    "types": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of all type names"
+    },
+    "matrix": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "number",
+          "enum": [0.5, 1, 2],
+          "description": "Effectiveness multiplier"
+        }
+      },
+      "description": "Type effectiveness matrix: {attackType: {defendType: multiplier}}"
+    }
+  },
+  "required": ["types", "matrix"],
+  "additionalProperties": false
+}

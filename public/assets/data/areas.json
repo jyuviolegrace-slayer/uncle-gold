@@ -1,0 +1,183 @@
+[
+  {
+    "id": "starter-forest",
+    "name": "Starter Forest",
+    "type": "Fire",
+    "description": "A peaceful forest where your adventure begins. Home to the starter Critters and gentle creatures.",
+    "levelRange": {"min": 2, "max": 8},
+    "wildCritters": [
+      {"speciesId": "embolt", "rarity": 35},
+      {"speciesId": "aqualis", "rarity": 35},
+      {"speciesId": "thornwick", "rarity": 30}
+    ],
+    "trainers": [],
+    "landmarks": ["Starting Point", "Forest Entrance"]
+  },
+  {
+    "id": "route-1-meadow",
+    "name": "Route 1: Meadow",
+    "type": "Grass",
+    "description": "A grassy meadow on the outskirts of town. Novice trainers practice here.",
+    "levelRange": {"min": 3, "max": 10},
+    "wildCritters": [
+      {"speciesId": "sparkit", "rarity": 40},
+      {"speciesId": "pupskin", "rarity": 35},
+      {"speciesId": "voltcharge", "rarity": 25}
+    ],
+    "trainers": [
+      {"trainerId": "trainer-1", "name": "Youngster Joey"}
+    ],
+    "landmarks": ["Pokémon Center", "Trainer School"]
+  },
+  {
+    "id": "route-2-forest",
+    "name": "Route 2: Sunlit Forest",
+    "type": "Grass",
+    "description": "A dense forest with tall grass. Many grass-type critters dwell here.",
+    "levelRange": {"min": 5, "max": 15},
+    "wildCritters": [
+      {"speciesId": "sparkit", "rarity": 30},
+      {"speciesId": "psychink", "rarity": 25},
+      {"speciesId": "venomling", "rarity": 20},
+      {"speciesId": "mudpupp", "rarity": 25}
+    ],
+    "trainers": [
+      {"trainerId": "trainer-2", "name": "Lass Bella"}
+    ],
+    "landmarks": ["Forest Shrine", "Tall Grass Field"]
+  },
+  {
+    "id": "volcanic-caverns",
+    "name": "Volcanic Caverns",
+    "type": "Fire",
+    "description": "Hot caves filled with lava flows. Dangerous but rich with fire-type critters.",
+    "levelRange": {"min": 15, "max": 25},
+    "wildCritters": [
+      {"speciesId": "boltiger", "rarity": 30},
+      {"speciesId": "rockpile", "rarity": 40},
+      {"speciesId": "houndrake", "rarity": 20},
+      {"speciesId": "frostwhip", "rarity": 10}
+    ],
+    "trainers": [
+      {"trainerId": "trainer-3", "name": "Gym Leader Blaze"}
+    ],
+    "landmarks": ["Lava Pools", "Crystal Formations"]
+  },
+  {
+    "id": "crystal-lake",
+    "name": "Crystal Lake",
+    "type": "Water",
+    "description": "A pristine lake surrounded by glaciers. Water and ice-type critters gather here.",
+    "levelRange": {"min": 20, "max": 30},
+    "wildCritters": [
+      {"speciesId": "tidecrown", "rarity": 35},
+      {"speciesId": "aqualis", "rarity": 25},
+      {"speciesId": "glaciarch", "rarity": 20},
+      {"speciesId": "frostwhip", "rarity": 20}
+    ],
+    "trainers": [
+      {"trainerId": "trainer-4", "name": "Gym Leader Marina"}
+    ],
+    "landmarks": ["Waterfall", "Ice Cavern"]
+  },
+  {
+    "id": "psychic-tower",
+    "name": "Psychic Tower",
+    "type": "Psychic",
+    "description": "A mysterious tower where psychic phenomena occur. Psychic-type critters are strong here.",
+    "levelRange": {"min": 25, "max": 35},
+    "wildCritters": [
+      {"speciesId": "mindseer", "rarity": 35},
+      {"speciesId": "psychink", "rarity": 30},
+      {"speciesId": "lightbringer", "rarity": 20},
+      {"speciesId": "radianceking", "rarity": 15}
+    ],
+    "trainers": [
+      {"trainerId": "trainer-5", "name": "Gym Leader Sage"}
+    ],
+    "landmarks": ["Tower Peak", "Meditation Chamber"]
+  },
+  {
+    "id": "electric-quarry",
+    "name": "Electric Quarry",
+    "type": "Electric",
+    "description": "An ancient quarry where electricity crackles in the air. Electric-type critters thrive here.",
+    "levelRange": {"min": 22, "max": 32},
+    "wildCritters": [
+      {"speciesId": "voltrix", "rarity": 40},
+      {"speciesId": "sparkit", "rarity": 30},
+      {"speciesId": "voltcharge", "rarity": 30}
+    ],
+    "trainers": [
+      {"trainerId": "trainer-6", "name": "Gym Leader Voltz"}
+    ],
+    "landmarks": ["Power Generator", "Mineral Deposits"]
+  },
+  {
+    "id": "underground-tunnels",
+    "name": "Underground Tunnels",
+    "type": "Ground",
+    "description": "Deep underground caverns. Home to ground and rock-type critters.",
+    "levelRange": {"min": 28, "max": 38},
+    "wildCritters": [
+      {"speciesId": "terrasmith", "rarity": 35},
+      {"speciesId": "stoneguard", "rarity": 30},
+      {"speciesId": "boulderan", "rarity": 20},
+      {"speciesId": "mudpupp", "rarity": 15}
+    ],
+    "trainers": [
+      {"trainerId": "trainer-7", "name": "Gym Leader Granite"}
+    ],
+    "landmarks": ["Crystal Caves", "Magma Chamber"]
+  },
+  {
+    "id": "dark-forest",
+    "name": "Dark Forest",
+    "type": "Dark",
+    "description": "A shadowy forest where darkness prevails. Dark-type critters hide in the shadows.",
+    "levelRange": {"min": 30, "max": 40},
+    "wildCritters": [
+      {"speciesId": "toxiclaw", "rarity": 35},
+      {"speciesId": "venomling", "rarity": 25},
+      {"speciesId": "infernus", "rarity": 5},
+      {"speciesId": "houndrake", "rarity": 35}
+    ],
+    "trainers": [
+      {"trainerId": "trainer-8", "name": "Gym Leader Shadow"}
+    ],
+    "landmarks": ["Shadow Sanctuary", "Ancient Ruins"]
+  },
+  {
+    "id": "fairy-meadow",
+    "name": "Fairy Meadow",
+    "type": "Fairy",
+    "description": "An enchanted meadow filled with magical energy. Fairy-type critters dance here.",
+    "levelRange": {"min": 35, "max": 45},
+    "wildCritters": [
+      {"speciesId": "radianceking", "rarity": 40},
+      {"speciesId": "lightbringer", "rarity": 30},
+      {"speciesId": "natureveil", "rarity": 10},
+      {"speciesId": "verdaxe", "rarity": 20}
+    ],
+    "trainers": [
+      {"trainerId": "trainer-9", "name": "Gym Leader Aurora"}
+    ],
+    "landmarks": ["Enchanted Garden", "Fairy Ring"]
+  },
+  {
+    "id": "legendary-peak",
+    "name": "Legendary Peak",
+    "type": "Fire",
+    "description": "The highest peak in the region. Legendary critters are said to dwell here.",
+    "levelRange": {"min": 45, "max": 55},
+    "wildCritters": [
+      {"speciesId": "infernus", "rarity": 40},
+      {"speciesId": "tidal", "rarity": 40},
+      {"speciesId": "natureveil", "rarity": 20}
+    ],
+    "trainers": [
+      {"trainerId": "champion", "name": "Champion"}
+    ],
+    "landmarks": ["Summit", "Sacred Shrine"]
+  }
+]

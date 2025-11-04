@@ -10,7 +10,7 @@ export class TypeChart {
    * Row = attacking type, Column = defending type
    * 2.0 = super effective, 1.0 = neutral, 0.5 = resisted
    */
-  private static readonly EFFECTIVENESS_MATRIX: Record<CritterType, TypeEffectivenessRow> = {
+  private static EFFECTIVENESS_MATRIX: Record<CritterType, TypeEffectivenessRow> = {
     Fire: {
       Fire: 0.5,
       Water: 0.5,
@@ -92,6 +92,14 @@ export class TypeChart {
       Fairy: 1.0,
     },
   };
+
+  /**
+   * Initialize the effectiveness matrix from JSON data
+   * @param matrixData The type matrix data loaded from JSON
+   */
+  static initializeFromMatrix(matrixData: Record<string, Record<string, number>>): void {
+    this.EFFECTIVENESS_MATRIX = matrixData as Record<CritterType, TypeEffectivenessRow>;
+  }
 
   /**
    * Get effectiveness multiplier for attacking with moveType against defending types
