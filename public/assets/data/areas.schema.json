@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Area/Route Schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the area"
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name of the area"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["Fire", "Water", "Grass", "Electric", "Psychic", "Ground", "Dark", "Fairy"],
+      "description": "Primary type theme of the area"
+    },
+    "description": {
+      "type": "string",
+      "description": "Area description and setting"
+    },
+    "levelRange": {
+      "type": "object",
+      "properties": {
+        "min": { "type": "number", "minimum": 1 },
+        "max": { "type": "number", "minimum": 1 }
+      },
+      "required": ["min", "max"],
+      "description": "Level range of critters in this area"
+    },
+    "wildCritters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "speciesId": { "type": "string" },
+          "rarity": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Spawn weight/rarity"
+          }
+        },
+        "required": ["speciesId", "rarity"]
+      },
+      "description": "Wild critters that can be encountered in this area"
+    },
+    "trainers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "trainerId": { "type": "string" },
+          "name": { "type": "string" }
+        },
+        "required": ["trainerId", "name"]
+      },
+      "description": "Trainers that can be fought in this area"
+    },
+    "landmarks": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Points of interest in the area"
+    }
+  },
+  "required": ["id", "name", "type", "description", "levelRange", "wildCritters"],
+  "additionalProperties": false
+}

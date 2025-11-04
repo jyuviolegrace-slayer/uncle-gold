@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Move Schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the move"
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name of the move"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["Fire", "Water", "Grass", "Electric", "Psychic", "Ground", "Dark", "Fairy"],
+      "description": "Type of the move"
+    },
+    "power": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 150,
+      "description": "Base power of the move (0 for status moves)"
+    },
+    "accuracy": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Accuracy percentage"
+    },
+    "basePP": {
+      "type": "number",
+      "minimum": 5,
+      "maximum": 40,
+      "description": "Base PP (power points)"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["Physical", "Special", "Status"],
+      "description": "Category of the move"
+    },
+    "effect": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["burn", "poison", "paralyze", "sleep", "freeze", "confusion", "heal", "stat-boost", "lower-spdef"],
+          "description": "Type of effect"
+        },
+        "chance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Chance for effect to trigger (%)"
+        },
+        "value": {
+          "type": "number",
+          "description": "Value for the effect (healing amount, stat boost level, etc.)"
+        }
+      },
+      "description": "Optional secondary effect"
+    }
+  },
+  "required": ["id", "name", "type", "power", "accuracy", "basePP", "category"],
+  "additionalProperties": false
+}

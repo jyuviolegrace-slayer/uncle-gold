@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Critter Species Schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the critter species"
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name of the critter"
+    },
+    "types": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["Fire", "Water", "Grass", "Electric", "Psychic", "Ground", "Dark", "Fairy"]
+      },
+      "minItems": 1,
+      "maxItems": 2,
+      "description": "Type(s) of the critter (1-2 types)"
+    },
+    "baseStats": {
+      "type": "object",
+      "properties": {
+        "hp": { "type": "number", "minimum": 1, "maximum": 255 },
+        "attack": { "type": "number", "minimum": 1, "maximum": 255 },
+        "defense": { "type": "number", "minimum": 1, "maximum": 255 },
+        "spAtk": { "type": "number", "minimum": 1, "maximum": 255 },
+        "spDef": { "type": "number", "minimum": 1, "maximum": 255 },
+        "speed": { "type": "number", "minimum": 1, "maximum": 255 }
+      },
+      "required": ["hp", "attack", "defense", "spAtk", "spDef", "speed"],
+      "description": "Base stats for this species"
+    },
+    "moves": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of move IDs this critter can learn"
+    },
+    "evolvesFrom": {
+      "type": "string",
+      "description": "Species ID this critter evolves from (optional)"
+    },
+    "evolvesInto": {
+      "type": "string",
+      "description": "Species ID this critter evolves into (optional)"
+    },
+    "evolutionLevel": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 100,
+      "description": "Level at which evolution occurs"
+    },
+    "pokedexEntry": {
+      "type": "string",
+      "description": "Pokedex description of the critter"
+    },
+    "height": {
+      "type": "number",
+      "minimum": 0.1,
+      "description": "Height in meters"
+    },
+    "weight": {
+      "type": "number",
+      "minimum": 0.1,
+      "description": "Weight in kilograms"
+    },
+    "catchRate": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 255,
+      "description": "Catch rate (higher = easier to catch)"
+    }
+  },
+  "required": ["id", "name", "types", "baseStats", "moves", "pokedexEntry", "height", "weight", "catchRate"],
+  "additionalProperties": false
+}

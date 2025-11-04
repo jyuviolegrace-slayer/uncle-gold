@@ -1,7 +1,13 @@
 import { Scene } from 'phaser';
+import { DataLoader } from '../data/loader';
+import { CritterSpeciesDatabase } from '../models/CritterSpeciesDatabase';
+import { MoveDatabase } from '../models/MoveDatabase';
+import { TypeChart } from '../models/TypeChart';
 
 export class Preloader extends Scene
 {
+    private progressText: Phaser.GameObjects.Text | null = null;
+
     constructor ()
     {
         super('Preloader');
@@ -9,39 +15,68 @@ export class Preloader extends Scene
 
     init ()
     {
-        //  We loaded this image in our Boot Scene, so we can display it here
         this.add.image(512, 384, 'background');
 
-        //  A simple progress bar. This is the outline of the bar.
         this.add.rectangle(512, 384, 468, 32).setStrokeStyle(1, 0xffffff);
 
-        //  This is the progress bar itself. It will increase in size from the left based on the % of progress.
         const bar = this.add.rectangle(512-230, 384, 4, 28, 0xffffff);
 
-        //  Use the 'progress' event emitted by the LoaderPlugin to update the loading bar
+        this.progressText = this.add.text(512, 450, 'Loading...', {
+            font: '16px Arial',
+            color: '#ffffff',
+        }).setOrigin(0.5);
+
         this.load.on('progress', (progress: number) => {
-
-            //  Update the progress bar (our bar is 464px wide, so 100% = 464px)
             bar.width = 4 + (460 * progress);
-
         });
     }
 
     preload ()
     {
-        //  Load the assets for the game - Replace with your own assets
         this.load.setPath('assets');
 
         this.load.image('logo', 'logo.png');
         this.load.image('star', 'star.png');
     }
 
-    create ()
+    async create ()
     {
-        //  When all the assets have loaded, it's often worth creating global objects here that the rest of the game can use.
-        //  For example, you can define global animations here, so we can use them in other scenes.
+        try {
+            if (this.progressText) {
+                this.progressText.setText('Loading game data...');
+            }
 
-        //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
-        this.scene.start('MainMenu');
+            const gameData = await DataLoader.loadAllGameData();
+
+            if (this.progressText) {
+                this.progressText.setText('Initializing databases...');
+            }
+
+            gameData.critters.forEach(critter => {
+                CritterSpeciesDatabase.registerSpecies(critter);
+            });
+
+            gameData.moves.forEach(move => {
+                MoveDatabase.registerMove(move);
+            });
+
+            TypeChart.initializeFromMatrix(gameData.typeMatrix.matrix);
+
+            if (this.progressText) {
+                this.progressText.setText('Ready!');
+            }
+
+            this.time.delayedCall(500, () => {
+                this.scene.start('MainMenu');
+            });
+        } catch (error) {
+            console.error('Failed to load game data during preload:', error);
+            if (this.progressText) {
+                this.progressText.setText('Error loading data. Check console.');
+            }
+            this.time.delayedCall(2000, () => {
+                this.scene.start('MainMenu');
+            });
+        }
     }
 }
