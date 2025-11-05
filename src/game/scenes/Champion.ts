@@ -72,7 +72,7 @@ export class Champion extends Scene {
 
     this.input.keyboard?.on('keydown-SPACE', () => {
       this.gameStateManager.saveGame();
-      this.scene.start('MainMenu');
+      this.scene.start('Title');
     });
 
     EventBus.emit('current-scene-ready', this);

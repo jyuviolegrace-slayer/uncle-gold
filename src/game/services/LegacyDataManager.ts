@@ -7,7 +7,7 @@ import { ISaveData, IPlayerState, ICritter, IInventory, IItem } from '../models/
  */
 export type TextSpeedOption = 'FAST' | 'MID' | 'SLOW';
 export type BattleSceneOption = 'ON' | 'OFF';
-export type BattleStyleOption = 'SHIFT' | 'SWITCH';
+export type BattleStyleOption = 'SHIFT' | 'SET';
 export type SoundOption = 'ON' | 'OFF';
 
 /**
@@ -535,6 +535,54 @@ export class LegacyDataManager {
    */
   getState(): IGlobalState {
     return JSON.parse(JSON.stringify(this.inMemoryState));
+  }
+
+  /**
+   * Get player state in modern format
+   */
+  getPlayerState(): IPlayerState {
+    const inventoryMap = new Map<string, number>();
+    for (const item of this.inMemoryState.inventory) {
+      if (item) {
+        inventoryMap.set(String(item.item.id), item.quantity);
+      }
+    }
+
+    return {
+      name: 'Player',
+      level: 1,
+      badges: [],
+      pokedex: new Set(),
+      inventory: {
+        items: inventoryMap,
+        capacity: 50,
+      },
+      party: {
+        critters: this.inMemoryState.monsters.inParty,
+        maxSize: 6,
+      },
+      money: 0,
+      position: this.inMemoryState.player.position,
+      currentArea: this.inMemoryState.player.location.area,
+      playtime: 0,
+    };
+  }
+
+  /**
+   * Load from ISaveData
+   */
+  loadFromSave(saveData: ISaveData): void {
+    this.convertSaveDataToLegacyState(saveData);
+  }
+
+  /**
+   * Update options from external source
+   */
+  updateOptions(options: Partial<ILegacyOptions>): void {
+    this.inMemoryState.options = {
+      ...this.inMemoryState.options,
+      ...options,
+    };
   }
 
   /**

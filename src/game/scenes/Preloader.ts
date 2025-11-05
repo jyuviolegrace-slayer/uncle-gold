@@ -9,20 +9,20 @@ import { LegacyDataManager } from '../services/LegacyDataManager';
 import { AudioManager } from '../managers/AudioManager';
 import {
   EXTERNAL_LINKS_ASSET_KEYS,
+  TITLE_ASSET_KEYS,
+  UI_ASSET_KEYS,
+  AUDIO_ASSET_KEYS,
   BATTLE_BACKGROUND_ASSET_KEYS,
   MONSTER_ASSET_KEYS,
   BATTLE_ASSET_KEYS,
   HEALTH_BAR_ASSET_KEYS,
   EXP_BAR_ASSET_KEYS,
-  UI_ASSET_KEYS,
   ATTACK_ASSET_KEYS,
   WORLD_ASSET_KEYS,
   BUILDING_ASSET_KEYS,
   CHARACTER_ASSET_KEYS,
-  TITLE_ASSET_KEYS,
   MONSTER_PARTY_ASSET_KEYS,
   INVENTORY_ASSET_KEYS,
-  AUDIO_ASSET_KEYS,
 } from '../assets/AssetKeys';
 
 /**
@@ -125,6 +125,23 @@ export class Preloader extends Scene {
             `${monsterTamerAssetPath}/battle/damagedBall.png`
         );
 
+        this.load.image('logo', 'logo.png');
+        this.load.image('star', 'star.png');
+
+        // Load legacy title screen assets
+        this.load.image(TITLE_ASSET_KEYS.BACKGROUND, 'legacy/images/monster-tamer/title-screen-background.png');
+        this.load.image(TITLE_ASSET_KEYS.TITLE, 'legacy/images/monster-tamer/title.png');
+        this.load.image(TITLE_ASSET_KEYS.PANEL, 'legacy/images/monster-tamer/title-panel.png');
+
+        // Load UI assets
+        this.load.image(UI_ASSET_KEYS.CURSOR, 'legacy/images/monster-tamer/ui/cursor.png');
+        this.load.image(UI_ASSET_KEYS.CURSOR_WHITE, 'legacy/images/monster-tamer/ui/cursor_white.png');
+        this.load.image(UI_ASSET_KEYS.MENU_BACKGROUND, 'legacy/images/kenneys-assets/ui-space-expansion/glassPanel.png');
+        this.load.image(UI_ASSET_KEYS.MENU_BACKGROUND_GREEN, 'legacy/images/kenneys-assets/ui-space-expansion/glassPanel_green.png');
+        this.load.image(UI_ASSET_KEYS.MENU_BACKGROUND_PURPLE, 'legacy/images/kenneys-assets/ui-space-expansion/glassPanel_purple.png');
+
+        // Load audio
+        this.load.audio(AUDIO_ASSET_KEYS.TITLE, 'legacy/audio/xDeviruchi/title-theme.mp3');
         // Health bar assets
         this.load.image(
             HEALTH_BAR_ASSET_KEYS.RIGHT_CAP,
@@ -349,6 +366,24 @@ export class Preloader extends Scene {
             // Initialize type effectiveness chart
             TypeChart.initializeFromMatrix(gameData.typeMatrix.matrix);
 
+            if (this.progressText) {
+                this.progressText.setText('Initializing save system...');
+            }
+
+            // Initialize SaveManager singleton
+            const saveManager = SaveManager.getInstance();
+            this.game.registry.set('saveManager', saveManager);
+
+            // Initialize LegacyDataManager
+            const legacyDataManager = new LegacyDataManager();
+            this.game.registry.set('legacyDataManager', legacyDataManager);
+
+            if (this.progressText) {
+                this.progressText.setText('Ready!');
+            }
+
+            EventBus.emit('current-scene-ready', this);
+
             this.setStatusText('Creating animations...');
 
             // Create animations from data
@@ -382,7 +417,7 @@ export class Preloader extends Scene {
 
             // Transition to MainMenu
             this.time.delayedCall(500, () => {
-                this.scene.start('MainMenu');
+                this.scene.start('Title');
             });
         } catch (error) {
             console.error('Failed to load game data during preload:', error);
@@ -390,6 +425,7 @@ export class Preloader extends Scene {
 
             // Attempt fallback to MainMenu after delay
             this.time.delayedCall(2000, () => {
+                this.scene.start('Title');
                 try {
                     this.scene.start('MainMenu');
                 } catch (err) {
