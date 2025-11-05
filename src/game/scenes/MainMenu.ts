@@ -15,6 +15,7 @@ export class MainMenu extends Scene
     infoText: GameObjects.Text | null = null;
     starterChoosing: boolean = false;
     selectionIndicator: GameObjects.Rectangle | null = null;
+    isConfirming: boolean = false;
 
     constructor ()
     {
@@ -58,22 +59,23 @@ export class MainMenu extends Scene
             }
         });
 
-        this.input.keyboard?.on('keydown-LEFT_ARROW', () => {
+        this.input.keyboard?.on('keydown-LEFT', () => {
             if (this.starterChoosing) {
                 this.selectedStarterIndex = (this.selectedStarterIndex - 1 + 3) % 3;
                 this.updateSelectionIndicator();
             }
         });
 
-        this.input.keyboard?.on('keydown-RIGHT_ARROW', () => {
+        this.input.keyboard?.on('keydown-RIGHT', () => {
             if (this.starterChoosing) {
                 this.selectedStarterIndex = (this.selectedStarterIndex + 1) % 3;
                 this.updateSelectionIndicator();
             }
         });
 
-        this.input.keyboard?.on('keydown-Z', () => {
-            if (this.starterChoosing) {
+        this.input.keyboard?.on('keydown-z', () => {
+            if (this.starterChoosing && !this.isConfirming) {
+                this.isConfirming = true;
                 this.selectStarter();
             }
         });
@@ -88,6 +90,7 @@ export class MainMenu extends Scene
         }
 
         this.starterChoosing = true;
+        this.isConfirming = false;
         this.title.setText('Choose Your Starter Critter');
         this.infoText?.setText('Use LEFT/RIGHT arrows to select | Press Z to confirm');
 
