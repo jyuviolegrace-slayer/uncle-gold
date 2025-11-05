@@ -22,7 +22,7 @@ export interface PlayerAssetConfig {
 
 export const DEFAULT_PLAYER_CONFIG: PlayerAssetConfig = {
   textureKey: 'player-brawler',
-  assetPath: 'assets/animations/brawler48x48.png',
+  assetPath: 'brawler48x48.png',
   frameWidth: 48,
   frameHeight: 48,
   scale: 2,
