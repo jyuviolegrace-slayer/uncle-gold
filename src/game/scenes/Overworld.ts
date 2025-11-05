@@ -224,15 +224,16 @@ export class Overworld extends Scene {
 
   private setupInput() {
     this.input.keyboard?.on('keydown-M', () => {
-      this.scene.start('Menu');
+      this.scene.pause();
+      this.scene.launch('Menu', { previousScene: 'Overworld' });
     });
 
     this.input.keyboard?.on('keydown-P', () => {
-      this.scene.start('Party');
+      this.scene.start('Party', { previousScene: 'Overworld' });
     });
 
     this.input.keyboard?.on('keydown-S', () => {
-      this.scene.start('Shop');
+      this.scene.start('Shop', { previousScene: 'Overworld' });
     });
 
     this.input.keyboard?.on('keydown-B', () => {
@@ -337,16 +338,17 @@ export class Overworld extends Scene {
       this.startBattle(data);
     });
 
-    EventBus.on('open-menu', () => {
-      this.scene.start('Menu');
+    EventBus.on('menu:open', () => {
+      this.scene.pause();
+      this.scene.launch('Menu', { previousScene: 'Overworld' });
     });
 
     EventBus.on('open-party', () => {
-      this.scene.start('Party');
+      this.scene.start('Party', { previousScene: 'Overworld' });
     });
 
     EventBus.on('open-shop', () => {
-      this.scene.start('Shop');
+      this.scene.start('Shop', { previousScene: 'Overworld' });
     });
   }
 
