@@ -1,6 +1,5 @@
 import { Boot } from "./scenes/Boot";
 import { GameOver } from "./scenes/GameOver";
-import { Game as MainGame } from "./scenes/Game";
 import { Title } from "./scenes/Title";
 import { Options } from "./scenes/Options";
 import { AUTO, Game } from "phaser";
@@ -38,7 +37,6 @@ const config: Phaser.Types.Core.GameConfig = {
         Preloader,
         Title,
         Options,
-        MainGame,
         GameOver,
         Overworld,
         Battle,

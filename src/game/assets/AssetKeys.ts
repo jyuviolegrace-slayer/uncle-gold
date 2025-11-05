@@ -1,7 +1,7 @@
 /**
  * Asset key constants for the game.
  * These keys are used to reference assets loaded by Phaser's loader.
- * Legacy assets are served from /assets/legacy/ and are organized by type and creator.
+ * Legacy assets are served from /assets/archive/ and are organized by type and creator.
  */
 
 export const EXTERNAL_LINKS_ASSET_KEYS = {

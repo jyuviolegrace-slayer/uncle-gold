@@ -5,7 +5,7 @@ import MobileControls from './components/MobileControls';
 
 function App() {
     const phaserRef = useRef<IRefPhaserGame | null>(null);
-    const [currentScene, setCurrentScene] = useState<string>('MainMenu');
+    const [currentScene, setCurrentScene] = useState<string>('Title');
     const [isMobile, setIsMobile] = useState(false);
 
     const handleSceneChange = (scene: Phaser.Scene) => {
@@ -23,7 +23,7 @@ function App() {
         return () => window.removeEventListener('resize', handleWindowResize);
     }, []);
 
-    const showUI = ['Overworld', 'Battle', 'Party', 'Shop', 'Menu', 'HUD', 'Inventory', 'MonsterParty', 'MonsterDetails'].includes(currentScene);
+    const showUI = ['Overworld', 'Battle', 'Party', 'Shop', 'Menu', 'HUD', 'Inventory', 'MonsterParty', 'MonsterDetails', 'Title', 'Options', 'GameOver', 'Champion'].includes(currentScene);
 
     return (
         <div id="app">
