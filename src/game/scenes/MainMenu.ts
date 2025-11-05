@@ -14,6 +14,7 @@ export class MainMenu extends Scene
     starterButtonsContainer: GameObjects.Container | null = null;
     infoText: GameObjects.Text | null = null;
     starterChoosing: boolean = false;
+    selectionIndicator: GameObjects.Rectangle | null = null;
 
     constructor ()
     {
@@ -59,15 +60,15 @@ export class MainMenu extends Scene
 
         this.input.keyboard?.on('keydown-LEFT_ARROW', () => {
             if (this.starterChoosing) {
-                this.selectedStarterIndex = Math.max(0, this.selectedStarterIndex - 1);
-                this.renderStarterButtons();
+                this.selectedStarterIndex = (this.selectedStarterIndex - 1 + 3) % 3;
+                this.updateSelectionIndicator();
             }
         });
 
         this.input.keyboard?.on('keydown-RIGHT_ARROW', () => {
             if (this.starterChoosing) {
-                this.selectedStarterIndex = Math.min(2, this.selectedStarterIndex + 1);
-                this.renderStarterButtons();
+                this.selectedStarterIndex = (this.selectedStarterIndex + 1) % 3;
+                this.updateSelectionIndicator();
             }
         });
 
@@ -92,6 +93,8 @@ export class MainMenu extends Scene
 
         this.starterButtonsContainer = this.add.container(150, 350);
         this.renderStarterButtons();
+        this.createSelectionIndicator();
+        this.updateSelectionIndicator();
     }
 
     private renderStarterButtons()
@@ -108,15 +111,41 @@ export class MainMenu extends Scene
 
         starters.forEach((starter, index) => {
             const x = index * 200;
-            const isSelected = index === this.selectedStarterIndex;
-            const bgColor = isSelected ? 0xffff00 : starter.color;
-            const bg = this.add.rectangle(x + 70, 50, 120, 100, bgColor);
+            const bg = this.add.rectangle(x + 70, 50, 120, 100, starter.color);
             const text = this.add.text(x + 10, 20, starter.name, {
                 font: '16px Arial',
                 color: '#000000'
             });
 
             this.starterButtonsContainer?.add([bg, text]);
+        });
+    }
+
+    private createSelectionIndicator()
+    {
+        if (!this.selectionIndicator && this.starterButtonsContainer) {
+            this.selectionIndicator = this.add.rectangle(0, 0, 140, 130)
+                .setStrokeStyle(4, 0xffff00)
+                .setFillStyle(undefined, 0)
+                .setDepth(99);
+            this.starterButtonsContainer.add(this.selectionIndicator);
+        }
+    }
+
+    private updateSelectionIndicator()
+    {
+        if (!this.selectionIndicator) return;
+
+        const x = this.selectedStarterIndex * 200 + 70;
+        const y = 50;
+        
+        this.selectionIndicator.setPosition(x, y);
+        
+        this.tweens.add({
+            targets: this.selectionIndicator,
+            scaleX: { from: 0.9, to: 1.0, duration: 100 },
+            scaleY: { from: 0.9, to: 1.0, duration: 100 },
+            ease: 'Back.easeOut'
         });
     }
 
