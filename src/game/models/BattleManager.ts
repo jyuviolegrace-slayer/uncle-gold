@@ -1,6 +1,8 @@
-import { IBattle, IBattleParticipant, IBattleTurn, ICritter, IMove, Stats } from './types';
+import { IBattle, IBattleParticipant, IBattleTurn, ICritter, IMove, Stats, CritterType } from './types';
 import { TypeChart } from './TypeChart';
 import { EventBus } from '../EventBus';
+import { AIDecisionMaker } from './AIDecisionMaker';
+import { CritterSpeciesDatabase } from './CritterSpeciesDatabase';
 
 /**
  * BattleManager - orchestrates turn-based battle logic
@@ -10,9 +12,11 @@ export class BattleManager {
   private battle: IBattle;
   private moveDatabase: Map<string, IMove> = new Map();
   private turnQueue: IBattleTurn[] = [];
+  private isWildEncounter: boolean;
 
   constructor(battle: IBattle) {
     this.battle = battle;
+    this.isWildEncounter = battle.isWildEncounter;
   }
 
   /**
@@ -278,8 +282,8 @@ export class BattleManager {
   }
 
   /**
-   * Process damage to active critter
-   */
+    * Process damage to active critter
+    */
   damageActiveCritter(participantId: string, damage: number): void {
     const critter = this.getActiveCritter(participantId);
     if (!critter) return;
@@ -294,5 +298,147 @@ export class BattleManager {
     if (critter.isFainted) {
       EventBus.emit('battle:fainted', { participantId, critterName: critter.nickname || 'Critter' });
     }
+  }
+
+  /**
+   * Get AI decision for opponent (wild or trainer)
+   */
+  getAIDecision(opponentCritter: ICritter, playerCritter: ICritter): IBattleTurn {
+    const species = CritterSpeciesDatabase.getSpecies(opponentCritter.speciesId);
+    const defenderTypes = species?.type || ['Fire'];
+
+    let moveId = '';
+
+    if (this.isWildEncounter) {
+      const decision = AIDecisionMaker.decideWildCritterMove(opponentCritter);
+      moveId = decision.moveId;
+    } else {
+      const decision = AIDecisionMaker.decideTrainerMove(
+        opponentCritter,
+        defenderTypes as CritterType[],
+        playerCritter.currentStats
+      );
+      moveId = decision.moveId;
+    }
+
+    return {
+      actorId: this.battle.opponent.id,
+      action: 'move',
+      moveId,
+    };
+  }
+
+  /**
+   * Calculate experience reward for battle
+   */
+  calculateExperienceReward(defeatedCritter: ICritter, winnerLevel: number): number {
+    const baseExp = 50;
+    const levelBonus = Math.max(1, defeatedCritter.level - winnerLevel);
+    const exp = Math.floor((baseExp * defeatedCritter.level) / 7 + levelBonus);
+    return Math.max(1, exp);
+  }
+
+  /**
+   * Distribute experience to winning critter
+   */
+  distributeExperience(winnerParticipantId: string, defeatedCritter: ICritter): number[] {
+    const winner = this.getActiveCritter(winnerParticipantId);
+    if (!winner) return [];
+
+    const experience = this.calculateExperienceReward(defeatedCritter, winner.level);
+    const levelUps = (winner as any).addExperience(experience);
+
+    EventBus.emit('battle:experienceGained', {
+      critterId: winner.id,
+      experience,
+      levelUps,
+    });
+
+    return levelUps;
+  }
+
+  /**
+   * Check if wild critter can be caught
+   */
+  canCatchWildCritter(wildCritter: ICritter): boolean {
+    return this.isWildEncounter && !wildCritter.isFainted;
+  }
+
+  /**
+   * Calculate catch probability
+   */
+  calculateCatchProbability(wildCritter: ICritter, catchPower: number = 1.0): number {
+    const species = CritterSpeciesDatabase.getSpecies(wildCritter.speciesId);
+    if (!species) return 0;
+
+    const maxHP = wildCritter.maxHP;
+    const currentHP = wildCritter.currentHP;
+    const hpRatio = currentHP / maxHP;
+    const catchRate = species.catchRate;
+
+    // Simplified catch formula
+    // Lower HP = higher catch rate
+    let probability = (3 * maxHP - 2 * currentHP) / (3 * maxHP) * (catchRate / 255) * catchPower;
+    probability = Math.min(1, probability);
+
+    return probability;
+  }
+
+  /**
+   * Attempt to catch a wild critter
+   */
+  attemptCatch(wildCritter: ICritter, catchPower: number = 1.0): boolean {
+    if (!this.canCatchWildCritter(wildCritter)) return false;
+
+    const probability = this.calculateCatchProbability(wildCritter, catchPower);
+    return Math.random() < probability;
+  }
+
+  /**
+   * Heal all critters in party (after battle)
+   */
+  healParty(participantId: string): void {
+    const participant = this.battle.player.id === participantId ? this.battle.player : this.battle.opponent;
+    participant.party.forEach(critter => {
+      (critter as any).heal();
+      (critter as any).resetMovePP();
+    });
+  }
+
+  /**
+   * Get battle summary
+   */
+  getBattleSummary(): {
+    playerCritters: Array<{ name: string; level: number; expGained: number }>;
+    opponentCritters: Array<{ name: string; level: number }>;
+    result: string;
+    turns: number;
+  } {
+    return {
+      playerCritters: this.battle.player.party.map(c => ({
+        name: c.nickname || 'Critter',
+        level: c.level,
+        expGained: 0,
+      })),
+      opponentCritters: this.battle.opponent.party.map(c => ({
+        name: c.nickname || 'Critter',
+        level: c.level,
+      })),
+      result: this.battle.battleStatus,
+      turns: this.battle.turnCount,
+    };
+  }
+
+  /**
+   * Attempt to flee from battle (only wild encounters)
+   */
+  attemptFlee(playerSpeed: number, opponentSpeed: number): boolean {
+    if (!this.isWildEncounter) return false;
+
+    // 50% base chance, scaled by speed difference
+    const speedFactor = playerSpeed / opponentSpeed;
+    const fleeChance = Math.min(0.9, 0.5 * speedFactor);
+
+    return Math.random() < fleeChance;
   }
 }
