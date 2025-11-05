@@ -1,7 +1,8 @@
 export { Character } from './Character';
 export { Player } from './Player';
 export { NPC, type NPCMovementPattern, type NPCConfig } from './NPC';
-export { Item, type ItemConfig } from './Item';
+export * from './characters';
+export { WorldItem as Item, type WorldItemConfig } from './Item';
 export { WorldMenu, type MenuOption } from './WorldMenu';
 export { EventZoneManager, type EventZoneConfig } from './EventZoneManager';
 export type { Coordinate, Direction } from './GridUtils';
