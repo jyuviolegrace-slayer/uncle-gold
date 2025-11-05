@@ -1,7 +1,7 @@
 import { Scene, GameObjects, Physics, Input } from 'phaser';
 import { EventBus } from '../EventBus';
 import { SceneContext } from './SceneContext';
-import { BattleManager, Critter, MoveDatabase, CritterSpeciesDatabase, ICritter, ItemDatabase } from '../models';
+import { BattleManager, Critter, MoveDatabase, CritterSpeciesDatabase, ICritter, ItemDatabase, TrainerDatabase } from '../models';
 import { AnimationManager } from '../managers/AnimationManager';
 
 interface BattleUIElements {
@@ -86,10 +86,21 @@ export class Battle extends Scene {
       const playerParty = party;
       let opponentParty: ICritter[] = [];
       let isWildEncounter = false;
+      let trainer = null;
 
       if (this.encounterData?.wildCritter) {
         isWildEncounter = true;
         opponentParty = [this.encounterData.wildCritter];
+      } else if (this.encounterData?.trainerId) {
+        isWildEncounter = false;
+        TrainerDatabase.initialize();
+        trainer = TrainerDatabase.getTrainer(this.encounterData.trainerId);
+        opponentParty = TrainerDatabase.getTrainerParty(this.encounterData.trainerId);
+
+        if (trainer?.badge) {
+          this.encounterData.trainer = trainer;
+          this.encounterData.badgeName = trainer.badge;
+        }
       } else {
         isWildEncounter = false;
         opponentParty = [new Critter('sparkit', 5)];
@@ -837,6 +848,25 @@ export class Battle extends Scene {
         const opponentCritter = this.battleManager.getActiveCritter(battle.opponent.id);
         if (opponentCritter) {
           this.battleManager.distributeExperience(battle.player.id, opponentCritter);
+        }
+
+        if (!battle.isWildEncounter && this.encounterData?.trainerId) {
+          const trainer = this.encounterData.trainer;
+          const gymLeaderId = this.encounterData.trainerId;
+
+          this.gameStateManager.defeatTrainer(gymLeaderId);
+
+          if (trainer?.badge) {
+            this.gameStateManager.addBadge(trainer.badge);
+            if (trainer.moneyReward) {
+              this.gameStateManager.addMoney(trainer.moneyReward);
+            }
+
+            const badgeName = trainer.badgeName || trainer.badge;
+            this.ui.messageText?.setText(`You earned the ${badgeName}!`);
+            await this.waitMs(1500);
+            EventBus.emit('badge:earned', { badgeId: trainer.badge, badgeName });
+          }
         }
       } else if (battle.battleStatus === 'OpponentWon') {
         result = 'defeat';

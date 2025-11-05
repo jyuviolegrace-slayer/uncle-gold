@@ -7,6 +7,7 @@ import { EventBus } from '../EventBus';
  */
 export class GameStateManager {
   private playerState: IPlayerState;
+  private defeatedTrainers: Set<string> = new Set();
   private readonly SAVE_KEY = 'critterquest_save';
   private readonly SAVE_VERSION = 1;
 
@@ -115,6 +116,28 @@ export class GameStateManager {
    */
   getBadgeCount(): number {
     return this.playerState.badges.length;
+  }
+
+  /**
+   * Mark trainer as defeated
+   */
+  defeatTrainer(trainerId: string): void {
+    this.defeatedTrainers.add(trainerId);
+    EventBus.emit('trainer:defeated', { trainerId });
+  }
+
+  /**
+   * Check if trainer has been defeated
+   */
+  hasDefeatedTrainer(trainerId: string): boolean {
+    return this.defeatedTrainers.has(trainerId);
+  }
+
+  /**
+   * Get defeated trainer count
+   */
+  getDefeatedTrainerCount(): number {
+    return this.defeatedTrainers.size;
   }
 
   /**
@@ -245,7 +268,7 @@ export class GameStateManager {
           },
         } as any,
         completedArenas: this.playerState.badges,
-        defeatedTrainers: [],
+        defeatedTrainers: Array.from(this.defeatedTrainers),
         caughtCritters: this.playerState.party.critters,
         playedMinutes: this.playerState.playtime,
       };
@@ -285,6 +308,8 @@ export class GameStateManager {
           items: new Map(saveData.playerState.inventory.items as unknown as [string, number][]),
         },
       };
+
+      this.defeatedTrainers = new Set(saveData.defeatedTrainers || []);
 
       EventBus.emit('game:loaded', { playerName: this.playerState.name });
       return true;

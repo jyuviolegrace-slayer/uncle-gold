@@ -1,11 +1,13 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
+import { SceneContext } from './SceneContext';
 
 export class GameOver extends Scene
 {
     camera: Phaser.Cameras.Scene2D.Camera;
     background: Phaser.GameObjects.Image;
     gameOverText : Phaser.GameObjects.Text;
+    private gameStateManager = SceneContext.getInstance().getGameStateManager();
 
     constructor ()
     {
@@ -15,6 +17,14 @@ export class GameOver extends Scene
     create ()
     {
         this.camera = this.cameras.main
+
+        const isChampion = this.gameStateManager.getBadgeCount() >= 8;
+
+        if (isChampion) {
+            this.scene.start('Champion');
+            return;
+        }
+
         this.camera.setBackgroundColor(0xff0000);
 
         this.background = this.add.image(512, 384, 'background');
