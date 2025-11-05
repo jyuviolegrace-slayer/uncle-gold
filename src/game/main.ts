@@ -12,6 +12,11 @@ import { Shop } from "./scenes/Shop";
 import { Menu } from "./scenes/Menu";
 import { HUD } from "./scenes/HUD";
 import { Champion } from "./scenes/Champion";
+import { Dialog } from "./scenes/Dialog";
+import { Cutscene } from "./scenes/Cutscene";
+import { Inventory } from "./scenes/Inventory";
+import { MonsterParty } from "./scenes/MonsterParty";
+import { MonsterDetails } from "./scenes/MonsterDetails";
 
 //  Find out more information about the Game Config at:
 //  https://newdocs.phaser.io/docs/3.70.0/Phaser.Types.Core.GameConfig
@@ -42,6 +47,11 @@ const config: Phaser.Types.Core.GameConfig = {
         Menu,
         HUD,
         Champion,
+        Dialog,
+        Cutscene,
+        Inventory,
+        MonsterParty,
+        MonsterDetails,
     ],
 };
 

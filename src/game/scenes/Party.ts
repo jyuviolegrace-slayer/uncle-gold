@@ -208,6 +208,18 @@ export class Party extends Scene {
       }
     });
 
+    this.input.keyboard?.on('keydown-ENTER', () => {
+      const party = this.gameStateManager.getParty();
+      if (party.length > 0 && party[this.selectedPartyIndex]) {
+        // Launch detailed monster party view
+        this.scene.launch('MonsterParty', { 
+          previousSceneName: 'Party',
+          activeBattleMonsterPartyIndex: undefined
+        });
+        this.scene.pause('Party');
+      }
+    });
+
     this.input.keyboard?.on('keydown-DELETE', () => {
       const party = this.gameStateManager.getParty();
       if (party.length > 0) {
@@ -231,9 +243,15 @@ export class Party extends Scene {
       this.renderPartyList();
       this.renderDetails();
     });
+
+    // Handle returning from MonsterParty
+    EventBus.on('monsterParty:closed', () => {
+      this.scene.resume('Party');
+    });
   }
 
   shutdown() {
     EventBus.off('party:updated');
+    EventBus.off('monsterParty:closed');
   }
 }

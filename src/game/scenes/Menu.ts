@@ -23,6 +23,14 @@ export class Menu extends Scene {
     }
   }
 
+  /**
+   * Handle scene resume from other UI scenes
+   */
+  handleSceneResume(data?: any) {
+    // Resume input handling
+    this.setupInput();
+  }
+
   create() {
     const width = this.game.config.width as number;
     const height = this.game.config.height as number;
@@ -126,6 +134,11 @@ export class Menu extends Scene {
         }
       });
     });
+
+    // Handle inventory closure
+    EventBus.on('inventory:closed', () => {
+      this.handleSceneResume();
+    });
   }
 
   private selectOption() {
@@ -140,7 +153,8 @@ export class Menu extends Scene {
         this.scene.start('Party', { previousScene: this.previousScene });
         break;
       case 'Bag':
-        this.infoText?.setText('Bag view not yet implemented');
+        this.scene.launch('Inventory', { previousScene: this.previousScene });
+        this.scene.pause('Menu');
         break;
       case 'Settings':
         this.infoText?.setText('Settings not yet implemented');
@@ -187,5 +201,6 @@ export class Menu extends Scene {
   shutdown() {
     EventBus.off('game:saved');
     EventBus.off('game:loaded');
+    EventBus.off('inventory:closed');
   }
 }
