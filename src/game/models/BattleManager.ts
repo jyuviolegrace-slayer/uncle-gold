@@ -16,8 +16,8 @@ export class BattleManager {
   }
 
   /**
-   * Initialize battle with participants
-   */
+    * Initialize battle with participants
+    */
   static createBattle(
     playerId: string,
     playerName: string,

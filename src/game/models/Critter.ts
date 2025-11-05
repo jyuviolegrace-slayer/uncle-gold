@@ -1,4 +1,5 @@
 import { ICritter, ICritterSpecies, IMove, IMoveInstance, Stats, StatusEffect, CritterType } from './types';
+import { CritterSpeciesDatabase } from './CritterSpeciesDatabase';
 
 /**
  * Critter class - represents an individual caught/trained critter
@@ -24,7 +25,9 @@ export class Critter implements ICritter {
     this.nickname = nickname;
     this.level = level;
     this.experience = this.calculateExperienceForLevel(level);
-    this.baseStats = { hp: 35, attack: 35, defense: 35, spAtk: 35, spDef: 35, speed: 35 };
+    
+    const species = CritterSpeciesDatabase.getSpecies(speciesId);
+    this.baseStats = species ? { ...species.baseStats } : { hp: 35, attack: 35, defense: 35, spAtk: 35, spDef: 35, speed: 35 };
     this.currentStats = { ...this.baseStats };
     this.maxHP = this.calculateHP();
     this.currentHP = this.maxHP;
