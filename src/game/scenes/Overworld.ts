@@ -7,13 +7,16 @@ import { PlayerController } from '../managers/PlayerController';
 import { EncounterSystem } from '../managers/EncounterSystem';
 import { DataLoader } from '../data/loader';
 import { IArea } from '../models/types';
+import { Player } from '../entities/Player';
+import { DEFAULT_PLAYER_CONFIG } from '../config/PlayerConfig';
 
 /**
  * Overworld Scene - Main exploration and navigation scene
  * Handles player movement, tilemap rendering, collisions, wild encounters, and NPC interactions
  */
 export class Overworld extends Scene {
-  private player: Physics.Arcade.Sprite | null = null;
+  private player: Player | null = null;
+  private playerSprite: Physics.Arcade.Sprite | null = null;
   private playerController: PlayerController | null = null;
   private gameStateManager = SceneContext.getInstance().getGameStateManager();
   private mapId: string = 'starter-town';
@@ -132,30 +135,33 @@ export class Overworld extends Scene {
     const playerX = playerGridX * tileSize + tileSize / 2;
     const playerY = playerGridY * tileSize + tileSize / 2;
 
-    this.player = this.physics.add.sprite(playerX, playerY, 'star');
-    this.player.setScale(1.5);
-    this.player.setCollideWorldBounds(true);
-    this.player.setBounce(0);
+    // Create player with animation system
+    this.player = new Player(this, playerX, playerY, DEFAULT_PLAYER_CONFIG);
+    this.playerSprite = this.player.getSprite();
+
+    // Setup world bounds
+    this.playerSprite.setCollideWorldBounds(true);
+    this.playerSprite.setBounce(0);
 
     // Setup camera to follow player
-    this.cameras.main.startFollow(this.player);
+    this.player.setCameraFollow(this.cameras.main);
     this.cameras.main.setBounds(0, 0, this.mapData.width * tileSize, this.mapData.height * tileSize);
 
     // Setup player controller
-    this.playerController = new PlayerController(this, this.player, {
+    this.playerController = new PlayerController(this, this.playerSprite, {
       speed: 200,
       enableKeyboard: true,
     });
   }
 
   private setupCollisions() {
-    if (!this.mapData || !this.player) return;
+    if (!this.mapData || !this.playerSprite) return;
 
     // Create collision bodies for all collision tiles
     this.collisionGroup = MapRenderer.createCollisionBodies(this, this.mapData);
 
     // Add collision between player and collision group
-    this.physics.add.collider(this.player, this.collisionGroup);
+    this.physics.add.collider(this.playerSprite, this.collisionGroup);
   }
 
   private setupEncounters() {
@@ -247,15 +253,15 @@ export class Overworld extends Scene {
   }
 
   private checkNearbyInteractions() {
-    if (!this.player) return;
+    if (!this.playerSprite) return;
 
     const interactionRadius = 64;
 
     // Check NPCs
     this.npcSprites.forEach(npcSprite => {
       const distance = Phaser.Math.Distance.Between(
-        this.player!.x,
-        this.player!.y,
+        this.playerSprite!.x,
+        this.playerSprite!.y,
         npcSprite.x,
         npcSprite.y
       );
@@ -273,8 +279,8 @@ export class Overworld extends Scene {
     // Check trainers
     this.trainerSprites.forEach(trainerSprite => {
       const distance = Phaser.Math.Distance.Between(
-        this.player!.x,
-        this.player!.y,
+        this.playerSprite!.x,
+        this.playerSprite!.y,
         trainerSprite.x,
         trainerSprite.y
       );
@@ -360,18 +366,21 @@ export class Overworld extends Scene {
 
   private startBattle(data?: any) {
     this.playerController?.stop();
+    if (this.player) {
+      this.player.stop();
+    }
     this.scene.pause();
     this.scene.start('Battle', data || { encounterType: 'wild' });
   }
 
   update() {
-    if (!this.player || !this.playerController || !this.encounterSystem) return;
+    if (!this.playerSprite || !this.playerController || !this.encounterSystem) return;
 
     // Update player movement
     this.playerController.update();
 
     // Check for random encounters
-    if (this.encounterSystem.checkEncounter(this.player.x, this.player.y)) {
+    if (this.encounterSystem.checkEncounter(this.playerSprite.x, this.playerSprite.y)) {
       this.playerController.stop();
       this.encounterSystem.triggerWildEncounter(this.mapId);
     }
