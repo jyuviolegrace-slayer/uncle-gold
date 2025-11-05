@@ -75,8 +75,8 @@ export class Overworld extends Scene {
       EventBus.emit('current-scene-ready', this);
     } catch (error) {
       console.error('Error creating Overworld scene:', error);
-      // Fallback to main menu
-      this.scene.start('MainMenu');
+      // Fallback to title
+      this.scene.start('Title');
     }
   }
 
