@@ -1,0 +1,228 @@
+[
+  {
+    "id": "npc-1",
+    "name": "Healer",
+    "type": "healer",
+    "frame": 30,
+    "animationKeyPrefix": "NPC_1",
+    "legacyId": "1",
+    "events": [
+      {
+        "requires": ["LOOKING_FOR_PROFESSOR"],
+        "type": "MESSAGE",
+        "data": {
+          "messages": ["The professor next door was looking for you."]
+        }
+      },
+      {
+        "requires": ["FOUND_PROFESSOR"],
+        "type": "MESSAGE",
+        "data": {
+          "messages": ["You should take a quick rest."]
+        }
+      },
+      {
+        "requires": ["FOUND_PROFESSOR"],
+        "type": "HEAL",
+        "data": {}
+      },
+      {
+        "requires": ["FOUND_PROFESSOR"],
+        "type": "SCENE_FADE_IN_AND_OUT",
+        "data": {
+          "fadeInDuration": 1000,
+          "fadeOutDuration": 1000,
+          "waitDuration": 1000
+        }
+      },
+      {
+        "requires": ["FOUND_PROFESSOR"],
+        "type": "MESSAGE",
+        "data": {
+          "messages": ["Oh good! You and your critters are looking great!"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "npc-2",
+    "name": "Helpful NPC",
+    "type": "helper",
+    "frame": 20,
+    "animationKeyPrefix": "NPC_3",
+    "legacyId": "2",
+    "events": [
+      {
+        "requires": ["LOOKING_FOR_PROFESSOR"],
+        "type": "MESSAGE",
+        "data": {
+          "messages": ["I last saw the professor heading out of town."]
+        }
+      },
+      {
+        "requires": ["FOUND_PROFESSOR"],
+        "type": "MESSAGE",
+        "data": {
+          "messages": ["Make sure you read the signposts for helpful tips!"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "npc-3",
+    "name": "Tutorial NPC",
+    "type": "tutorial",
+    "frame": 0,
+    "animationKeyPrefix": "NPC_1",
+    "legacyId": "3",
+    "events": [
+      {
+        "requires": [],
+        "type": "MESSAGE",
+        "data": {
+          "messages": ["You can save your game from the menu.", "To open the menu, press the ENTER key."]
+        }
+      }
+    ]
+  },
+  {
+    "id": "npc-4",
+    "name": "Trainer 1",
+    "type": "trainer",
+    "frame": 190,
+    "animationKeyPrefix": "NPC_20",
+    "legacyId": "4",
+    "events": [
+      {
+        "requires": [],
+        "type": "MESSAGE",
+        "data": {
+          "messages": ["Hey! Let's battle!"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "npc-5",
+    "name": "Trainer 2",
+    "type": "trainer",
+    "frame": 180,
+    "animationKeyPrefix": "NPC_19",
+    "legacyId": "5",
+    "events": [
+      {
+        "requires": [],
+        "type": "MESSAGE",
+        "data": {
+          "messages": ["Hey! Let's battle!"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "npc-6",
+    "name": "Advisor",
+    "type": "advisor",
+    "frame": 60,
+    "animationKeyPrefix": "NPC_7",
+    "legacyId": "6",
+    "events": [
+      {
+        "requires": [],
+        "type": "MESSAGE",
+        "data": {
+          "messages": ["You should make sure to stock up on items."]
+        }
+      }
+    ]
+  },
+  {
+    "id": "npc-7",
+    "name": "Cautious NPC",
+    "type": "helper",
+    "frame": 150,
+    "animationKeyPrefix": "NPC_16",
+    "legacyId": "7",
+    "events": [
+      {
+        "requires": [],
+        "type": "MESSAGE",
+        "data": {
+          "messages": ["I would stay out of the spooky forest."]
+        }
+      }
+    ]
+  },
+  {
+    "id": "npc-8",
+    "name": "Health Advisor",
+    "type": "advisor",
+    "frame": 160,
+    "animationKeyPrefix": "NPC_17",
+    "legacyId": "8",
+    "events": [
+      {
+        "requires": [],
+        "type": "MESSAGE",
+        "data": {
+          "messages": ["Make sure you heal your team before you head out!"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "npc-9",
+    "name": "Trainer 3",
+    "type": "trainer",
+    "frame": 180,
+    "animationKeyPrefix": "NPC_19",
+    "legacyId": "9",
+    "events": [
+      {
+        "requires": [],
+        "type": "MESSAGE",
+        "data": {
+          "messages": ["Hey! Let's battle!"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "npc-10",
+    "name": "Nurse",
+    "type": "healer",
+    "frame": 50,
+    "animationKeyPrefix": "NPC_6",
+    "legacyId": "10",
+    "events": [
+      {
+        "requires": [],
+        "type": "MESSAGE",
+        "data": {
+          "messages": ["Feel free to rest here."]
+        }
+      },
+      {
+        "requires": [],
+        "type": "HEAL",
+        "data": {}
+      },
+      {
+        "requires": [],
+        "type": "SCENE_FADE_IN_AND_OUT",
+        "data": {
+          "fadeInDuration": 1000,
+          "fadeOutDuration": 1000,
+          "waitDuration": 1000
+        }
+      },
+      {
+        "requires": [],
+        "type": "MESSAGE",
+        "data": {
+          "messages": ["Oh good! You and your critters are looking great!"]
+        }
+      }
+    ]
+  }
+]

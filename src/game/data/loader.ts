@@ -1,4 +1,14 @@
 import { IMove, ICritterSpecies, IItem, IArea, CritterType } from '../models/types';
+import {
+  ILegacyMonster,
+  ILegacyAttack,
+  ILegacyItem,
+  ILegacyNPCDefinition,
+  ILegacySign,
+  ILegacyEventDefinition,
+  ILegacyEncounterMap,
+  ILegacyIDMapping,
+} from '../models/legacyTypes';
 
 /**
  * Data loader utility for fetching and parsing JSON game data files
@@ -233,6 +243,258 @@ export class DataLoader {
 
       return area as IArea;
     });
+  }
+
+  /**
+   * Load legacy critters data from JSON
+   */
+  static async loadLegacyCritters(): Promise<ICritterSpecies[]> {
+    try {
+      const response = await fetch(`${this.baseUrl}/legacy-critters.json`);
+      if (!response.ok) {
+        throw new Error(`Failed to load legacy critters: ${response.statusText}`);
+      }
+      const data = await response.json();
+      return this.validateCrittersData(data);
+    } catch (error) {
+      console.error('Error loading legacy critters data:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Load legacy moves data from JSON
+   */
+  static async loadLegacyMoves(): Promise<IMove[]> {
+    try {
+      const response = await fetch(`${this.baseUrl}/legacy-moves.json`);
+      if (!response.ok) {
+        throw new Error(`Failed to load legacy moves: ${response.statusText}`);
+      }
+      const data = await response.json();
+      return this.validateMovesData(data);
+    } catch (error) {
+      console.error('Error loading legacy moves data:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Load legacy items data from JSON
+   */
+  static async loadLegacyItems(): Promise<IItem[]> {
+    try {
+      const response = await fetch(`${this.baseUrl}/legacy-items.json`);
+      if (!response.ok) {
+        throw new Error(`Failed to load legacy items: ${response.statusText}`);
+      }
+      const data = await response.json();
+      return this.validateItemsData(data);
+    } catch (error) {
+      console.error('Error loading legacy items data:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Load legacy encounters data from JSON
+   */
+  static async loadLegacyEncounters(): Promise<Record<string, Array<{ speciesId: string; rarity: number }>>> {
+    try {
+      const response = await fetch(`${this.baseUrl}/legacy-encounters.json`);
+      if (!response.ok) {
+        throw new Error(`Failed to load legacy encounters: ${response.statusText}`);
+      }
+      const data = await response.json();
+      return this.validateLegacyEncountersData(data);
+    } catch (error) {
+      console.error('Error loading legacy encounters data:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Load legacy NPCs data from JSON
+   */
+  static async loadLegacyNPCs(): Promise<ILegacyNPCDefinition[]> {
+    try {
+      const response = await fetch(`${this.baseUrl}/legacy-npcs.json`);
+      if (!response.ok) {
+        throw new Error(`Failed to load legacy NPCs: ${response.statusText}`);
+      }
+      const data = await response.json();
+      return this.validateLegacyNPCsData(data);
+    } catch (error) {
+      console.error('Error loading legacy NPCs data:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Load legacy events data from JSON
+   */
+  static async loadLegacyEvents(): Promise<ILegacyEventDefinition[]> {
+    try {
+      const response = await fetch(`${this.baseUrl}/legacy-events.json`);
+      if (!response.ok) {
+        throw new Error(`Failed to load legacy events: ${response.statusText}`);
+      }
+      const data = await response.json();
+      return this.validateLegacyEventsData(data);
+    } catch (error) {
+      console.error('Error loading legacy events data:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Load legacy signs data from JSON
+   */
+  static async loadLegacySigns(): Promise<ILegacySign[]> {
+    try {
+      const response = await fetch(`${this.baseUrl}/legacy-signs.json`);
+      if (!response.ok) {
+        throw new Error(`Failed to load legacy signs: ${response.statusText}`);
+      }
+      const data = await response.json();
+      return this.validateLegacySignsData(data);
+    } catch (error) {
+      console.error('Error loading legacy signs data:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Load legacy ID mappings from JSON
+   */
+  static async loadLegacyIDMappings(): Promise<ILegacyIDMapping> {
+    try {
+      const response = await fetch(`${this.baseUrl}/legacy-id-mappings.json`);
+      if (!response.ok) {
+        throw new Error(`Failed to load legacy ID mappings: ${response.statusText}`);
+      }
+      const data = await response.json();
+      return this.validateLegacyIDMappings(data);
+    } catch (error) {
+      console.error('Error loading legacy ID mappings:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Load all legacy game data in parallel
+   */
+  static async loadAllLegacyData(): Promise<{
+    critters: ICritterSpecies[];
+    moves: IMove[];
+    items: IItem[];
+    encounters: Record<string, Array<{ speciesId: string; rarity: number }>>;
+    npcs: ILegacyNPCDefinition[];
+    events: ILegacyEventDefinition[];
+    signs: ILegacySign[];
+    mappings: ILegacyIDMapping;
+  }> {
+    try {
+      const [critters, moves, items, encounters, npcs, events, signs, mappings] = await Promise.all([
+        this.loadLegacyCritters(),
+        this.loadLegacyMoves(),
+        this.loadLegacyItems(),
+        this.loadLegacyEncounters(),
+        this.loadLegacyNPCs(),
+        this.loadLegacyEvents(),
+        this.loadLegacySigns(),
+        this.loadLegacyIDMappings(),
+      ]);
+
+      return { critters, moves, items, encounters, npcs, events, signs, mappings };
+    } catch (error) {
+      console.error('Error loading all legacy game data:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Validate legacy encounters data structure
+   */
+  private static validateLegacyEncountersData(data: any): Record<string, Array<{ speciesId: string; rarity: number }>> {
+    if (typeof data !== 'object' || Array.isArray(data)) {
+      throw new Error('Legacy encounters data must be an object');
+    }
+
+    Object.entries(data).forEach(([areaId, encounters]: [string, any]) => {
+      if (!Array.isArray(encounters)) {
+        throw new Error(`Invalid encounters for area ${areaId}`);
+      }
+      encounters.forEach((encounter: any, index: number) => {
+        if (!encounter.speciesId || encounter.rarity === undefined) {
+          throw new Error(`Invalid encounter at area ${areaId} index ${index}`);
+        }
+      });
+    });
+
+    return data;
+  }
+
+  /**
+   * Validate legacy NPCs data structure
+   */
+  private static validateLegacyNPCsData(data: any): ILegacyNPCDefinition[] {
+    if (!Array.isArray(data)) {
+      throw new Error('Legacy NPCs data must be an array');
+    }
+
+    data.forEach((npc: any) => {
+      if (!npc.id || !npc.frame || !npc.animationKeyPrefix || !Array.isArray(npc.events)) {
+        throw new Error(`Invalid NPC data: missing required fields`);
+      }
+    });
+
+    return data;
+  }
+
+  /**
+   * Validate legacy events data structure
+   */
+  private static validateLegacyEventsData(data: any): ILegacyEventDefinition[] {
+    if (!Array.isArray(data)) {
+      throw new Error('Legacy events data must be an array');
+    }
+
+    data.forEach((event: any) => {
+      if (!event.id || !Array.isArray(event.events)) {
+        throw new Error(`Invalid event data: missing required fields`);
+      }
+    });
+
+    return data;
+  }
+
+  /**
+   * Validate legacy signs data structure
+   */
+  private static validateLegacySignsData(data: any): ILegacySign[] {
+    if (!Array.isArray(data)) {
+      throw new Error('Legacy signs data must be an array');
+    }
+
+    data.forEach((sign: any) => {
+      if (!sign.id || !sign.message) {
+        throw new Error(`Invalid sign data: missing required fields`);
+      }
+    });
+
+    return data;
+  }
+
+  /**
+   * Validate legacy ID mappings
+   */
+  private static validateLegacyIDMappings(data: any): ILegacyIDMapping {
+    if (!data.monsterIdMap || !data.attackIdMap || !data.itemIdMap || !data.areaIdMap) {
+      throw new Error('Legacy ID mappings must have monsterIdMap, attackIdMap, itemIdMap, and areaIdMap');
+    }
+
+    return data as ILegacyIDMapping;
   }
 }
 

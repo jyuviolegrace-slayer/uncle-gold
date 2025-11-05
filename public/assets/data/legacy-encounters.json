@@ -1,0 +1,52 @@
+{
+  "route-1": [
+    {
+      "speciesId": "carnodusk",
+      "rarity": 45
+    },
+    {
+      "speciesId": "ignivolt",
+      "rarity": 40
+    },
+    {
+      "speciesId": "aquavalor",
+      "rarity": 10
+    },
+    {
+      "speciesId": "frostsaber",
+      "rarity": 25
+    }
+  ],
+  "route-2": [
+    {
+      "speciesId": "carnodusk",
+      "rarity": 45
+    },
+    {
+      "speciesId": "ignivolt",
+      "rarity": 40
+    },
+    {
+      "speciesId": "aquavalor",
+      "rarity": 10
+    },
+    {
+      "speciesId": "frostsaber",
+      "rarity": 25
+    }
+  ],
+  "forest-area": [
+    {
+      "speciesId": "iguanignite",
+      "rarity": 30
+    },
+    {
+      "speciesId": "aquavalor",
+      "rarity": 40
+    },
+    {
+      "speciesId": "frostsaber",
+      "rarity": 30
+    }
+  ]
+}

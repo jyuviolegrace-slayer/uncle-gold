@@ -1,0 +1,102 @@
+[
+  {
+    "id": "iguanignite",
+    "name": "Iguanignite",
+    "types": ["Fire"],
+    "baseStats": {
+      "hp": 25,
+      "attack": 5,
+      "defense": 5,
+      "spAtk": 5,
+      "spDef": 5,
+      "speed": 5
+    },
+    "moves": ["slash"],
+    "pokedexEntry": "A fire-type reptilian critter from the legacy world.",
+    "height": 0.5,
+    "weight": 3.5,
+    "catchRate": 45,
+    "legacyId": 1,
+    "legacyAssetKey": "IGUANIGNITE"
+  },
+  {
+    "id": "carnodusk",
+    "name": "Carnodusk",
+    "types": ["Dark"],
+    "baseStats": {
+      "hp": 25,
+      "attack": 5,
+      "defense": 5,
+      "spAtk": 5,
+      "spDef": 5,
+      "speed": 5
+    },
+    "moves": ["ice-shard"],
+    "pokedexEntry": "A dark-type predatory critter from the legacy world.",
+    "height": 0.6,
+    "weight": 4.2,
+    "catchRate": 45,
+    "legacyId": 2,
+    "legacyAssetKey": "CARNODUSK"
+  },
+  {
+    "id": "ignivolt",
+    "name": "Ignivolt",
+    "types": ["Fire", "Electric"],
+    "baseStats": {
+      "hp": 25,
+      "attack": 5,
+      "defense": 5,
+      "spAtk": 5,
+      "spDef": 5,
+      "speed": 5
+    },
+    "moves": ["slash"],
+    "pokedexEntry": "A dual-type fire and electric critter from the legacy world.",
+    "height": 0.5,
+    "weight": 3.8,
+    "catchRate": 45,
+    "legacyId": 3,
+    "legacyAssetKey": "IGNIVOLT"
+  },
+  {
+    "id": "aquavalor",
+    "name": "Aquavalor",
+    "types": ["Water"],
+    "baseStats": {
+      "hp": 25,
+      "attack": 5,
+      "defense": 5,
+      "spAtk": 5,
+      "spDef": 5,
+      "speed": 5
+    },
+    "moves": ["slash"],
+    "pokedexEntry": "A water-type aquatic critter from the legacy world.",
+    "height": 0.5,
+    "weight": 3.5,
+    "catchRate": 45,
+    "legacyId": 4,
+    "legacyAssetKey": "AQUAVALOR"
+  },
+  {
+    "id": "frostsaber",
+    "name": "Frostsaber",
+    "types": ["Water"],
+    "baseStats": {
+      "hp": 25,
+      "attack": 5,
+      "defense": 5,
+      "spAtk": 5,
+      "spDef": 5,
+      "speed": 5
+    },
+    "moves": ["ice-shard"],
+    "pokedexEntry": "A water-type icy critter from the legacy world.",
+    "height": 0.5,
+    "weight": 3.6,
+    "catchRate": 45,
+    "legacyId": 5,
+    "legacyAssetKey": "FROSTSABER"
+  }
+]
