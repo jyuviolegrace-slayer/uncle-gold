@@ -78,30 +78,30 @@ export class Preloader extends Scene {
     preload(): void {
         this.setStatusText('Loading assets...');
 
-        // Asset paths from legacy project
-        const monsterTamerAssetPath = 'legacy/images/monster-tamer';
-        const kenneysAssetPath = 'legacy/images/kenneys-assets';
-        const pimenAssetPath = 'legacy/images/pimen';
-        const axulArtAssetPath = 'legacy/images/axulart';
-        const pbGamesAssetPath = 'legacy/images/parabellum-games';
+        // Asset paths from archived legacy project
+        const monsterTamerAssetPath = 'archive/images/monster-tamer';
+        const kenneysAssetPath = 'archive/images/kenneys-assets';
+        const pimenAssetPath = 'archive/images/pimen';
+        const axulArtAssetPath = 'archive/images/axulart';
+        const pbGamesAssetPath = 'archive/images/parabellum-games';
 
         // External social links (optional)
         if (this.SHOW_SOCIAL_LINKS) {
             this.load.image(
                 EXTERNAL_LINKS_ASSET_KEYS.GITHUB_BANNER,
-                'legacy/images/external-social/forkme_right_red_aa0000.webp'
+                'archive/images/external-social/forkme_right_red_aa0000.webp'
             );
             this.load.image(
                 EXTERNAL_LINKS_ASSET_KEYS.YOUTUBE_BUTTON,
-                'legacy/images/external-social/WatchonYouTube-white-3xPNG.png'
+                'archive/images/external-social/WatchonYouTube-white-3xPNG.png'
             );
             this.load.image(
                 EXTERNAL_LINKS_ASSET_KEYS.LEARN_MORE_BACKGROUND,
-                'legacy/images/external-social/blank.png'
+                'archive/images/external-social/blank.png'
             );
             this.load.image(
                 EXTERNAL_LINKS_ASSET_KEYS.YOUTUBE_THUMB_NAIL,
-                'legacy/images/external-social/thumbnail.jpeg'
+                'archive/images/external-social/thumbnail.jpeg'
             );
         }
 
@@ -129,19 +129,19 @@ export class Preloader extends Scene {
         this.load.image('star', 'star.png');
 
         // Load legacy title screen assets
-        this.load.image(TITLE_ASSET_KEYS.BACKGROUND, 'legacy/images/monster-tamer/title-screen-background.png');
-        this.load.image(TITLE_ASSET_KEYS.TITLE, 'legacy/images/monster-tamer/title.png');
-        this.load.image(TITLE_ASSET_KEYS.PANEL, 'legacy/images/monster-tamer/title-panel.png');
+        this.load.image(TITLE_ASSET_KEYS.BACKGROUND, 'archive/images/monster-tamer/title-screen-background.png');
+        this.load.image(TITLE_ASSET_KEYS.TITLE, 'archive/images/monster-tamer/title.png');
+        this.load.image(TITLE_ASSET_KEYS.PANEL, 'archive/images/monster-tamer/title-panel.png');
 
         // Load UI assets
-        this.load.image(UI_ASSET_KEYS.CURSOR, 'legacy/images/monster-tamer/ui/cursor.png');
-        this.load.image(UI_ASSET_KEYS.CURSOR_WHITE, 'legacy/images/monster-tamer/ui/cursor_white.png');
-        this.load.image(UI_ASSET_KEYS.MENU_BACKGROUND, 'legacy/images/kenneys-assets/ui-space-expansion/glassPanel.png');
-        this.load.image(UI_ASSET_KEYS.MENU_BACKGROUND_GREEN, 'legacy/images/kenneys-assets/ui-space-expansion/glassPanel_green.png');
-        this.load.image(UI_ASSET_KEYS.MENU_BACKGROUND_PURPLE, 'legacy/images/kenneys-assets/ui-space-expansion/glassPanel_purple.png');
+        this.load.image(UI_ASSET_KEYS.CURSOR, 'archive/images/monster-tamer/ui/cursor.png');
+        this.load.image(UI_ASSET_KEYS.CURSOR_WHITE, 'archive/images/monster-tamer/ui/cursor_white.png');
+        this.load.image(UI_ASSET_KEYS.MENU_BACKGROUND, 'archive/images/kenneys-assets/ui-space-expansion/glassPanel.png');
+        this.load.image(UI_ASSET_KEYS.MENU_BACKGROUND_GREEN, 'archive/images/kenneys-assets/ui-space-expansion/glassPanel_green.png');
+        this.load.image(UI_ASSET_KEYS.MENU_BACKGROUND_PURPLE, 'archive/images/kenneys-assets/ui-space-expansion/glassPanel_purple.png');
 
         // Load audio
-        this.load.audio(AUDIO_ASSET_KEYS.TITLE, 'legacy/audio/xDeviruchi/title-theme.mp3');
+        this.load.audio(AUDIO_ASSET_KEYS.TITLE, 'archive/audio/xDeviruchi/title-theme.mp3');
         // Health bar assets
         this.load.image(
             HEALTH_BAR_ASSET_KEYS.RIGHT_CAP,
@@ -229,7 +229,7 @@ export class Preloader extends Scene {
             WORLD_ASSET_KEYS.MAIN_1_BACKGROUND,
             `${monsterTamerAssetPath}/map/main_1_level_background.png`
         );
-        this.load.tilemapTiledJSON(WORLD_ASSET_KEYS.MAIN_1_LEVEL, 'legacy/data/main_1.json');
+        this.load.tilemapTiledJSON(WORLD_ASSET_KEYS.MAIN_1_LEVEL, 'archive/data/main_1.json');
         this.load.image(
             WORLD_ASSET_KEYS.WORLD_COLLISION,
             `${monsterTamerAssetPath}/map/collision.png`
@@ -256,7 +256,7 @@ export class Preloader extends Scene {
             BUILDING_ASSET_KEYS.BUILDING_1_BACKGROUND,
             `${monsterTamerAssetPath}/map/buildings/building_1_level_background.png`
         );
-        this.load.tilemapTiledJSON(BUILDING_ASSET_KEYS.BUILDING_1_LEVEL, 'legacy/data/building_1.json');
+        this.load.tilemapTiledJSON(BUILDING_ASSET_KEYS.BUILDING_1_LEVEL, 'archive/data/building_1.json');
         this.load.image(
             BUILDING_ASSET_KEYS.BUILDING_2_FOREGROUND,
             `${monsterTamerAssetPath}/map/buildings/building_2_level_foreground.png`
@@ -265,7 +265,7 @@ export class Preloader extends Scene {
             BUILDING_ASSET_KEYS.BUILDING_2_BACKGROUND,
             `${monsterTamerAssetPath}/map/buildings/building_2_level_background.png`
         );
-        this.load.tilemapTiledJSON(BUILDING_ASSET_KEYS.BUILDING_2_LEVEL, 'legacy/data/building_2.json');
+        this.load.tilemapTiledJSON(BUILDING_ASSET_KEYS.BUILDING_2_LEVEL, 'archive/data/building_2.json');
         this.load.image(
             BUILDING_ASSET_KEYS.BUILDING_3_FOREGROUND,
             `${monsterTamerAssetPath}/map/buildings/building_3_level_foreground.png`
@@ -274,7 +274,7 @@ export class Preloader extends Scene {
             BUILDING_ASSET_KEYS.BUILDING_3_BACKGROUND,
             `${monsterTamerAssetPath}/map/buildings/building_3_level_background.png`
         );
-        this.load.tilemapTiledJSON(BUILDING_ASSET_KEYS.BUILDING_3_LEVEL, 'legacy/data/building_3.json');
+        this.load.tilemapTiledJSON(BUILDING_ASSET_KEYS.BUILDING_3_LEVEL, 'archive/data/building_3.json');
 
         // Forest assets
         this.load.image(
@@ -285,7 +285,7 @@ export class Preloader extends Scene {
             WORLD_ASSET_KEYS.FOREST_1_FOREGROUND,
             `${monsterTamerAssetPath}/map/forest_1_level_foreground.png`
         );
-        this.load.tilemapTiledJSON(WORLD_ASSET_KEYS.FOREST_1_LEVEL, 'legacy/data/forest_1.json');
+        this.load.tilemapTiledJSON(WORLD_ASSET_KEYS.FOREST_1_LEVEL, 'archive/data/forest_1.json');
 
         // Character sprites
         this.load.spritesheet(CHARACTER_ASSET_KEYS.PLAYER, `${axulArtAssetPath}/character/custom.png`, {
@@ -323,12 +323,12 @@ export class Preloader extends Scene {
         );
 
         // Audio tracks
-        this.load.setPath('legacy/audio/xDeviruchi');
+        this.load.setPath('archive/audio/xDeviruchi');
         this.load.audio(AUDIO_ASSET_KEYS.MAIN, 'And-the-Journey-Begins.wav');
         this.load.audio(AUDIO_ASSET_KEYS.BATTLE, 'Decisive-Battle.wav');
         this.load.audio(AUDIO_ASSET_KEYS.TITLE, 'Title-Theme.wav');
 
-        this.load.setPath('legacy/audio/leohpaz');
+        this.load.setPath('archive/audio/leohpaz');
         this.load.audio(AUDIO_ASSET_KEYS.CLAW, '03_Claw_03.wav');
         this.load.audio(AUDIO_ASSET_KEYS.GRASS, '03_Step_grass_03.wav');
         this.load.audio(AUDIO_ASSET_KEYS.ICE, '13_Ice_explosion_01.wav');
@@ -336,7 +336,7 @@ export class Preloader extends Scene {
 
         // Load data files from public/assets/data
         this.load.setPath('data');
-        this.load.json('ANIMATIONS', 'legacy/animations.json');
+        this.load.json('ANIMATIONS', 'archive/animations.json');
     }
 
     async create(): Promise<void> {
@@ -413,14 +413,9 @@ export class Preloader extends Scene {
             console.error('Failed to load game data during preload:', error);
             this.setStatusText('Error loading data. Check console.');
 
-            // Attempt fallback to MainMenu after delay
+            // Attempt fallback to Title after delay
             this.time.delayedCall(2000, () => {
                 this.scene.start('Title');
-                try {
-                    this.scene.start('MainMenu');
-                } catch (err) {
-                    console.error('Failed to start MainMenu:', err);
-                }
             });
         }
     }

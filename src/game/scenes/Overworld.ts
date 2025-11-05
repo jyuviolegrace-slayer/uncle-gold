@@ -387,7 +387,7 @@ export class Overworld extends Scene {
         if (this.worldMenu) {
           this.worldMenu.hide();
         }
-        this.scene.start('MainMenu');
+        this.scene.start('Title');
         break;
     }
   }
