@@ -7,6 +7,8 @@ import { PlayerController } from '../managers/PlayerController';
 import { EncounterSystem } from '../managers/EncounterSystem';
 import { DataLoader } from '../data/loader';
 import { IArea } from '../models/types';
+import { AudioManager, PoolManager, PerformanceMonitor } from '../managers';
+import { SaveManager, LegacyDataManager } from '../services';
 import {
   Player,
   NPC,
@@ -55,6 +57,9 @@ export class Overworld extends Scene {
 
   async create() {
     try {
+      // Setup modern managers
+      this.setupManagers();
+
       // Load areas data
       await this.loadAreasData();
 
@@ -115,6 +120,42 @@ export class Overworld extends Scene {
       }
     } catch (error) {
       console.error('Error loading areas data:', error);
+    }
+  }
+
+  /**
+   * Setup modern managers and integrate with SceneContext
+   */
+  private setupManagers(): void {
+    const sceneContext = SceneContext.getInstance();
+    
+    // Initialize save and legacy data managers if not already set
+    if (!sceneContext.getSaveManager()) {
+      const saveManager = SaveManager.getInstance();
+      sceneContext.setSaveManager(saveManager);
+    }
+    
+    if (!sceneContext.getLegacyDataManager()) {
+      const legacyDataManager = new LegacyDataManager();
+      sceneContext.setLegacyDataManager(legacyDataManager);
+    }
+    
+    // Setup audio manager if not already available
+    if (!sceneContext.getAudioManager()) {
+      const audioManager = new AudioManager(this);
+      sceneContext.setAudioManager(audioManager);
+    }
+    
+    // Setup pool manager if not already available
+    if (!sceneContext.getPoolManager()) {
+      const poolManager = new PoolManager(this);
+      sceneContext.setPoolManager(poolManager);
+    }
+    
+    // Setup performance monitor if not already available
+    if (!sceneContext.getPerformanceMonitor()) {
+      const performanceMonitor = new PerformanceMonitor(this);
+      sceneContext.setPerformanceMonitor(performanceMonitor);
     }
   }
 
@@ -536,6 +577,43 @@ export class Overworld extends Scene {
     EventBus.on('open-shop', () => {
       this.scene.start('Shop', { previousScene: 'Overworld' });
     });
+
+    // Handle zone events for area changes and interactions
+    EventBus.on('zone:entrance-enter', (data: any) => {
+      const fromArea = this.mapId;
+      const toArea = data.data?.destination || data.zoneName;
+      
+      if (toArea && toArea !== fromArea) {
+        EventBus.emit('area:changed', {
+          fromArea,
+          toArea
+        });
+      }
+    });
+
+    EventBus.on('zone:warp-trigger', (data: any) => {
+      const destination = data.data?.destination;
+      if (destination) {
+        EventBus.emit('warp:start', { destination });
+      }
+    });
+
+    EventBus.on('zone:interaction-enter', (data: any) => {
+      EventBus.emit('npc:interact', { 
+        npcId: data.zoneId,
+        npcName: data.zoneName 
+      });
+    });
+
+    EventBus.on('zone:event-trigger', (data: any) => {
+      // Handle item collection from event zones
+      if (data.data?.item) {
+        EventBus.emit('item:collected', {
+          itemId: data.data.item,
+          quantity: data.data.quantity || 1
+        });
+      }
+    });
   }
 
   private launchHUD() {
@@ -559,6 +637,13 @@ export class Overworld extends Scene {
     // Check for random encounters
     if (this.encounterSystem.checkEncounter(this.player.x, this.player.y)) {
       this.playerController.stop();
+      
+      // Emit encounter start event
+      EventBus.emit('encounter:start', {
+        area: this.mapId,
+        encounterType: 'wild'
+      });
+      
       this.encounterSystem.triggerWildEncounter(this.mapId);
     }
 
@@ -579,6 +664,10 @@ export class Overworld extends Scene {
     EventBus.off('zone:warp-trigger');
     EventBus.off('zone:interaction-enter');
     EventBus.off('zone:exit');
+    EventBus.off('area:changed');
+    EventBus.off('warp:start');
+    EventBus.off('npc:interact');
+    EventBus.off('item:collected');
 
     if (this.playerController) {
       this.playerController.shutdown();

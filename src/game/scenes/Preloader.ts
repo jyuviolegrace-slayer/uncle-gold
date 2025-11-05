@@ -391,11 +391,9 @@ export class Preloader extends Scene {
 
             this.setStatusText('Initializing managers...');
 
-            // Initialize SaveManager
-            const saveManager = SaveManager.getInstance();
-
-            // Initialize LegacyDataManager for backwards compatibility
-            const legacyDataManager = new LegacyDataManager();
+            // Use previously initialized managers
+            const saveMgr = SaveManager.getInstance();
+            const legacyDataMgr = new LegacyDataManager();
 
             // Initialize AudioManager with legacy options
             const audioManager = new AudioManager(this, {
@@ -406,8 +404,8 @@ export class Preloader extends Scene {
             });
 
             // Store managers in game registry for access from other scenes
-            this.game.registry.set('saveManager', saveManager);
-            this.game.registry.set('legacyDataManager', legacyDataManager);
+            this.game.registry.set('saveManager', saveMgr);
+            this.game.registry.set('legacyDataManager', legacyDataMgr);
             this.game.registry.set('audioManager', audioManager);
 
             this.setStatusText('Ready!');

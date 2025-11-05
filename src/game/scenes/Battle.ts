@@ -10,7 +10,7 @@ import {
   ItemDatabase,
   TrainerDatabase,
 } from '../models';
-import { AnimationManager, PoolManager, DamageNumber, AudioManager } from '../managers';
+import { AnimationManager, PoolManager, DamageNumber, AudioManager, PerformanceMonitor } from '../managers';
 import { BattleBackground, CaptureOrb, BattleUIManager, BattleStateMachine } from '../battle';
 
 /**
@@ -74,10 +74,21 @@ export class Battle extends Scene {
    * Setup all manager instances
    */
   private setupManagers(): void {
+    const sceneContext = SceneContext.getInstance();
+    
+    // Use SceneContext managers if available, otherwise create new ones
     this.animationManager = new AnimationManager(this);
-    this.poolManager = new PoolManager(this);
+    this.poolManager = sceneContext.getPoolManager() || new PoolManager(this);
     this.poolManager.createPool('damageNumber', DamageNumber, { maxSize: 20 });
-    this.audioManager = new AudioManager(this);
+    this.audioManager = sceneContext.getAudioManager() || new AudioManager(this);
+    
+    // Store managers in SceneContext for other scenes
+    sceneContext.setPoolManager(this.poolManager);
+    sceneContext.setAudioManager(this.audioManager);
+    
+    // Setup performance monitor
+    const performanceMonitor = new PerformanceMonitor(this);
+    sceneContext.setPerformanceMonitor(performanceMonitor);
   }
 
   /**
@@ -630,6 +641,14 @@ export class Battle extends Scene {
           this.battleManager.damageActiveCritter(battle.opponent.id, result.damage);
           await this.animationManager?.damageFlash(this.uiManager.getOpponentSpriteContainer() as any);
 
+          // Emit turn completion event
+          EventBus.emit('battle:turn-complete', {
+            attacker: playerCritter.id,
+            defender: opponentCritter.id,
+            damage: result.damage,
+            moveId: moveId
+          });
+
           if (result.isSuperEffective) {
             this.uiManager.setMessageText('Super effective!');
             await this.waitMs(500);
@@ -705,6 +724,14 @@ export class Battle extends Scene {
 
       this.battleManager.damageActiveCritter(battle.player.id, result.damage);
       await this.animationManager?.damageFlash(this.uiManager.getPlayerSpriteContainer() as any);
+
+      // Emit turn completion event
+      EventBus.emit('battle:turn-complete', {
+        attacker: opponentCritter.id,
+        defender: playerCritter.id,
+        damage: result.damage,
+        moveId: aiDecision.moveId
+      });
 
       if (result.isSuperEffective) {
         this.uiManager.setMessageText('Super effective!');
@@ -797,6 +824,12 @@ export class Battle extends Scene {
     await this.captureOrb.playThrowAnimation();
 
     const caught = this.battleManager.attemptCatch(wildCritter, item.catchModifier || 1.0);
+
+    // Emit capture attempt event
+    EventBus.emit('battle:capture-attempt', {
+      critterId: wildCritter.id,
+      success: caught
+    });
 
     if (caught) {
       const stages = this.battleManager.simulateCatchAnimation() || 4;
@@ -908,6 +941,7 @@ export class Battle extends Scene {
             playerCritter.level += 1;
             playerCritter.experience -= calculateExpForLevel(playerCritter.level);
             this.uiManager?.setMessageText(`${playerCritter.nickname || 'Critter'} leveled up to ${playerCritter.level}!`);
+            EventBus.emit('level:up', { critterId: playerCritter.id, newLevel: playerCritter.level });
           }
         });
       });

@@ -207,6 +207,11 @@ export class SaveManager {
             slot,
             timestamp: saveData.timestamp,
           });
+          
+          EventBus.emit('save:notification', {
+            type: 'success',
+            message: `Game saved to slot ${slot + 1}!`
+          });
           return {
             success: true,
             slot,
@@ -232,6 +237,10 @@ export class SaveManager {
       const errorMsg = error instanceof Error ? error.message : String(error);
       console.error('Failed to save game:', error);
       EventBus.emit('game:saveFailed', { slot, error: errorMsg });
+      EventBus.emit('save:notification', {
+        type: 'error',
+        message: `Save failed: ${errorMsg}`
+      });
       return { success: false, slot, error: errorMsg };
     }
   }
@@ -265,12 +274,20 @@ export class SaveManager {
 
       request.onsuccess = () => {
         EventBus.emit('game:saved', { slot, timestamp });
+        EventBus.emit('save:notification', {
+          type: 'success',
+          message: `Game saved to slot ${slot + 1}!`
+        });
         resolve({ success: true, slot, timestamp });
       };
 
       request.onerror = () => {
         const error = 'IndexedDB write failed';
         EventBus.emit('game:saveFailed', { slot, error });
+        EventBus.emit('save:notification', {
+          type: 'error',
+          message: `Save failed: ${error}`
+        });
         resolve({ success: false, slot, error });
       };
     });
@@ -589,13 +606,26 @@ export class SaveManager {
           const result = await saveFunction();
           if (result.success) {
             EventBus.emit('autosave:success', { slot: result.slot });
+            EventBus.emit('save:notification', {
+              type: 'success',
+              message: 'Auto-saved successfully!'
+            });
           } else {
             EventBus.emit('autosave:failed', { error: result.error });
+            EventBus.emit('save:notification', {
+              type: 'error',
+              message: `Auto-save failed: ${result.error}`
+            });
           }
         } catch (error) {
           console.error('Auto-save failed:', error);
+          const errorMsg = error instanceof Error ? error.message : String(error);
           EventBus.emit('autosave:failed', {
-            error: error instanceof Error ? error.message : String(error),
+            error: errorMsg,
+          });
+          EventBus.emit('save:notification', {
+            type: 'error',
+            message: `Auto-save failed: ${errorMsg}`
           });
         }
       }
