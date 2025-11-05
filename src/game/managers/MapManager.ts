@@ -3,6 +3,9 @@
  * Handles map file loading and rendering
  */
 
+export type ObjectType = 'building' | 'tree' | 'rock' | 'sign' | 'door' | 'flower' | 'fence' | 'water' | 'bridge' | 'other';
+export type POIType = 'shop' | 'pokecenter' | 'gym' | 'pokedex' | 'house' | 'landmark' | 'other';
+
 export interface IMapTile {
   id: number;
   x: number;
@@ -25,6 +28,39 @@ export interface ITrainerSpawn {
   trainerId: string;
 }
 
+export interface IMapObject {
+  id: string;
+  type: ObjectType;
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
+  color?: string;
+  interactive?: boolean;
+  onInteract?: string;
+  tint?: number;
+}
+
+export interface IPointOfInterest {
+  id: string;
+  name: string;
+  type: POIType;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  description?: string;
+  npcId?: string;
+}
+
+export interface IGroundItem {
+  id: string;
+  itemId: string;
+  x: number;
+  y: number;
+  quantity?: number;
+}
+
 export interface IMapData {
   id: string;
   name: string;
@@ -38,6 +74,9 @@ export interface IMapData {
   playerSpawn: { x: number; y: number };
   npcs: INPCSpawn[];
   trainers: ITrainerSpawn[];
+  objects?: IMapObject[];
+  pointsOfInterest?: IPointOfInterest[];
+  groundItems?: IGroundItem[];
 }
 
 export class MapManager {

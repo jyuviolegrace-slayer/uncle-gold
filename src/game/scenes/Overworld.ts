@@ -1,7 +1,7 @@
 import { Scene, GameObjects, Physics } from 'phaser';
 import { EventBus } from '../EventBus';
 import { SceneContext } from './SceneContext';
-import MapManager, { IMapData } from '../managers/MapManager';
+import MapManager, { IMapData, IMapObject, IPointOfInterest } from '../managers/MapManager';
 import MapRenderer from '../managers/MapRenderer';
 import { PlayerController } from '../managers/PlayerController';
 import { EncounterSystem } from '../managers/EncounterSystem';
@@ -24,6 +24,8 @@ export class Overworld extends Scene {
   private trainerSprites: Map<string, Physics.Arcade.Sprite> = new Map();
   private areas: Map<string, IArea> = new Map();
   private currentArea: IArea | null = null;
+  private poiSprites: Map<string, Phaser.GameObjects.Rectangle> = new Map();
+  private objectSprites: Map<string, Phaser.GameObjects.Rectangle> = new Map();
 
   constructor() {
     super('Overworld');
@@ -57,6 +59,9 @@ export class Overworld extends Scene {
 
       // Setup NPCs and trainers
       this.setupNPCsAndTrainers();
+
+      // Setup objects and POIs
+      this.setupObjectsAndPOIs();
 
       // Setup input
       this.setupInput();
@@ -222,6 +227,44 @@ export class Overworld extends Scene {
     });
   }
 
+  private setupObjectsAndPOIs() {
+    if (!this.mapData) return;
+
+    const tileSize = this.mapData.tileSize;
+
+    // Setup objects
+    if (this.mapData.objects) {
+      this.mapData.objects.forEach((obj: IMapObject) => {
+        const width = ((obj.width || 1) * tileSize);
+        const height = ((obj.height || 1) * tileSize);
+        const x = obj.x * tileSize + width / 2;
+        const y = obj.y * tileSize + height / 2;
+
+        const objSprite = this.add.rectangle(x, y, width, height);
+        objSprite.setVisible(false);
+        objSprite.setData('objectData', obj);
+        objSprite.setData('type', 'mapObject');
+        this.objectSprites.set(obj.id, objSprite);
+      });
+    }
+
+    // Setup POIs
+    if (this.mapData.pointsOfInterest) {
+      this.mapData.pointsOfInterest.forEach((poi: IPointOfInterest) => {
+        const width = (poi.width * tileSize);
+        const height = (poi.height * tileSize);
+        const x = poi.x * tileSize + width / 2;
+        const y = poi.y * tileSize + height / 2;
+
+        const poiSprite = this.add.rectangle(x, y, width, height);
+        poiSprite.setVisible(false);
+        poiSprite.setData('poiData', poi);
+        poiSprite.setData('type', 'poi');
+        this.poiSprites.set(poi.id, poiSprite);
+      });
+    }
+  }
+
   private setupInput() {
     this.input.keyboard?.on('keydown-M', () => {
       this.scene.pause();
@@ -291,6 +334,26 @@ export class Overworld extends Scene {
         } else {
           this.initiateTrainerBattle(trainerData.trainerId, trainerData.name);
         }
+      }
+    });
+
+    // Check POIs
+    this.poiSprites.forEach(poiSprite => {
+      const distance = Phaser.Math.Distance.Between(
+        this.player!.x,
+        this.player!.y,
+        poiSprite.x,
+        poiSprite.y
+      );
+
+      if (distance < interactionRadius) {
+        const poiData = poiSprite.getData('poiData');
+        EventBus.emit('poi:interact', {
+          poiId: poiData.id,
+          poiName: poiData.name,
+          poiType: poiData.type,
+          description: poiData.description,
+        });
       }
     });
   }
@@ -390,5 +453,7 @@ export class Overworld extends Scene {
 
     this.npcSprites.clear();
     this.trainerSprites.clear();
+    this.poiSprites.clear();
+    this.objectSprites.clear();
   }
 }
