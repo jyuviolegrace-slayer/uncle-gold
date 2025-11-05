@@ -268,6 +268,20 @@ export class LegacyDataManager {
   }
 
   /**
+   * Get menu color
+   */
+  getMenuColor(): number {
+    return this.inMemoryState.options.menuColor || 1;
+  }
+
+  /**
+   * Get text speed
+   */
+  getTextSpeed(): TextSpeedOption {
+    return this.inMemoryState.options.textSpeed || 'MID';
+  }
+
+  /**
    * Get current options
    */
   getOptions(): ILegacyOptions {
