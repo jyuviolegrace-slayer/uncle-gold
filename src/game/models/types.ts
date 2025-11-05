@@ -121,9 +121,12 @@ export interface IItem {
   name: string;
   description: string;
   type: 'Pokeball' | 'Potion' | 'Key Item' | 'TM' | 'Berry' | 'Other';
+  tier?: number;
+  catchModifier?: number;
+  price?: number;
   effect?: {
     type: string;
-    value?: number;
+    value?: number | string;
   };
 }
 

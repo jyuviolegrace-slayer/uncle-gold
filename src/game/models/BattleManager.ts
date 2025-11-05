@@ -365,33 +365,69 @@ export class BattleManager {
   }
 
   /**
-   * Calculate catch probability
+   * Calculate catch probability with enhanced formula
+   * Formula: baseRate * orb.modifier * statusBonus * (1 - target.hp / target.maxHp)
    */
-  calculateCatchProbability(wildCritter: ICritter, catchPower: number = 1.0): number {
+  calculateCatchProbability(wildCritter: ICritter, orbModifier: number = 1.0, statusBonus: number = 1.0): number {
     const species = CritterSpeciesDatabase.getSpecies(wildCritter.speciesId);
     if (!species) return 0;
 
     const maxHP = wildCritter.maxHP;
     const currentHP = wildCritter.currentHP;
-    const hpRatio = currentHP / maxHP;
     const catchRate = species.catchRate;
 
-    // Simplified catch formula
-    // Lower HP = higher catch rate
-    let probability = (3 * maxHP - 2 * currentHP) / (3 * maxHP) * (catchRate / 255) * catchPower;
+    const baseRate = catchRate / 255;
+    const hpFactor = 1 - (currentHP / maxHP);
+
+    // Combined formula: base * orb * status * hp_factor
+    let probability = baseRate * orbModifier * statusBonus * hpFactor;
     probability = Math.min(1, probability);
 
     return probability;
   }
 
   /**
-   * Attempt to catch a wild critter
+   * Get status effect bonus for catch attempts
    */
-  attemptCatch(wildCritter: ICritter, catchPower: number = 1.0): boolean {
+  getStatusBonus(status?: string): number {
+    if (!status) return 1.0;
+    
+    switch (status) {
+      case 'Sleep':
+      case 'Freeze':
+        return 2.0;
+      case 'Paralyze':
+      case 'Poison':
+      case 'Burn':
+        return 1.5;
+      default:
+        return 1.0;
+    }
+  }
+
+  /**
+   * Attempt to catch a wild critter with orb
+   */
+  attemptCatch(wildCritter: ICritter, orbModifier: number = 1.0): boolean {
     if (!this.canCatchWildCritter(wildCritter)) return false;
 
-    const probability = this.calculateCatchProbability(wildCritter, catchPower);
+    const statusBonus = this.getStatusBonus(wildCritter.status);
+    const probability = this.calculateCatchProbability(wildCritter, orbModifier, statusBonus);
     return Math.random() < probability;
+  }
+
+  /**
+   * Simulate catch animation stages
+   * Returns an array of stage results (1-4 shakes before success/failure)
+   */
+  simulateCatchAnimation(): number {
+    const stages = [0.3, 0.6, 0.85, 1.0];
+    for (let i = 0; i < stages.length; i++) {
+      if (Math.random() > stages[i]) {
+        return i + 1;
+      }
+    }
+    return 4;
   }
 
   /**
