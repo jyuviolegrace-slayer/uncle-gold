@@ -221,7 +221,7 @@ export interface IArea {
   type: CritterType;
   description: string;
   levelRange: { min: number; max: number };
-  wildCritters: string[];
+  wildCritters: Array<{ speciesId: string; rarity: number }>;
   trainers: ITrainer[];
   landmarks: string[];
 }
