@@ -1,39 +1,63 @@
 import { Scene } from 'phaser';
 import { PerformanceMonitor } from '../managers/PerformanceMonitor';
+import { EventBus } from '../EventBus';
 
-export class Boot extends Scene
-{
+/**
+ * Boot Scene - Initializes core systems and loads minimal assets for Preloader
+ * 
+ * Responsibilities:
+ * - Setup input system (fullscreen, debug mode)
+ * - Initialize PerformanceMonitor
+ * - Load minimal assets needed for preloader UI
+ * - Configure scale settings
+ * - Transition to Preloader scene
+ */
+export class Boot extends Scene {
     private performanceMonitor: PerformanceMonitor | null = null;
 
-    constructor ()
-    {
+    constructor() {
         super('Boot');
     }
 
-    preload ()
-    {
-        //  The Boot Scene is typically used to load in any assets you require for your Preloader, such as a game logo or background.
-        //  The smaller the file size of the assets, the better, as the Boot Scene itself has no preloader.
-
+    preload(): void {
+        // Load minimal assets for boot/preloader UI
         this.load.image('background', 'assets/bg.png');
     }
 
-    create ()
-    {
-        // Initialize performance monitoring
-        this.performanceMonitor = new PerformanceMonitor(this);
-        
-        // Store in game data for access from other scenes
-        this.game.registry.set('performanceMonitor', this.performanceMonitor);
-        
-        // Setup input for debug toggle
-        this.input.keyboard?.on('keydown-D', () => {
-            if (this.performanceMonitor) {
-                this.performanceMonitor.toggleDebugDisplay();
-            }
-        });
+    create(): void {
+        try {
+            // Initialize performance monitoring
+            this.performanceMonitor = new PerformanceMonitor(this);
+            
+            // Store in game data for access from other scenes
+            this.game.registry.set('performanceMonitor', this.performanceMonitor);
+            
+            // Setup input for debug toggle
+            this.input.keyboard?.on('keydown-D', () => {
+                if (this.performanceMonitor) {
+                    this.performanceMonitor.toggleDebugDisplay();
+                }
+            });
 
-        this.scene.start('Preloader');
+            // Setup fullscreen toggle (F key from legacy controls)
+            this.input.keyboard?.on('keydown-F', () => {
+                if (this.scale.isFullscreen) {
+                    this.scale.stopFullscreen();
+                } else {
+                    this.scale.startFullscreen();
+                }
+            });
+
+            // Emit boot ready event for React integration
+            EventBus.emit('current-scene-ready', this);
+
+            // Transition to Preloader
+            this.scene.start('Preloader');
+        } catch (error) {
+            console.error('Error in Boot scene create:', error);
+            // Fallback to Preloader even on error
+            this.scene.start('Preloader');
+        }
     }
 
     update(time: number, deltaTime: number): void {
@@ -46,5 +70,7 @@ export class Boot extends Scene
         if (this.performanceMonitor) {
             this.performanceMonitor.shutdown();
         }
+        this.input.keyboard?.off('keydown-D');
+        this.input.keyboard?.off('keydown-F');
     }
 }
