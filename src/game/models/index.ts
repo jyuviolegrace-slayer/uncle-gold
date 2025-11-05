@@ -17,3 +17,4 @@ export { PlayerParty } from './PlayerParty';
 export { MoveLearningManager } from './MoveLearningManager';
 export { EvolutionManager, type IEvolution } from './EvolutionManager';
 export { ItemDatabase } from './ItemDatabase';
+export { TrainerDatabase } from './TrainerDatabase';

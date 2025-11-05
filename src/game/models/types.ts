@@ -199,6 +199,15 @@ export interface IBattle {
 }
 
 /**
+ * Trainer roster entry (specific critter with level)
+ */
+export interface ITrainerCritterEntry {
+  speciesId: string;
+  level: number;
+  moves?: string[];
+}
+
+/**
  * Trainer definition (Gym Leaders, Elite Four, Champion, etc.)
  */
 export interface ITrainer {
@@ -206,13 +215,42 @@ export interface ITrainer {
   name: string;
   title: string;
   type?: CritterType;
-  party: ICritterSpecies[];
   badge?: string;
+  badgeName?: string;
+  moneyReward?: number;
+  party: ITrainerCritterEntry[];
   dialogue: {
     intro: string;
     victory: string;
     defeat: string;
   };
+  canBattleMultipleTimes?: boolean;
+}
+
+/**
+ * Gym definition
+ */
+export interface IGym {
+  id: string;
+  name: string;
+  leaderName: string;
+  type: CritterType;
+  description: string;
+  badgeId: string;
+  badgeName: string;
+  leaderId: string;
+  leader: ITrainer;
+  prerequisiteBadges: string[];
+}
+
+/**
+ * Area unlock requirement
+ */
+export interface IAreaUnlock {
+  badgeId?: string;
+  completedArena?: string;
+  itemRequired?: string;
+  minLevel?: number;
 }
 
 /**
@@ -225,8 +263,11 @@ export interface IArea {
   description: string;
   levelRange: { min: number; max: number };
   wildCritters: Array<{ speciesId: string; rarity: number }>;
-  trainers: ITrainer[];
+  trainers: Array<{ trainerId: string; name: string }>;
   landmarks: string[];
+  unlockRequirements?: IAreaUnlock;
+  isGym?: boolean;
+  gymData?: IGym;
 }
 
 /**

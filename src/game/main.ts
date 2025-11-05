@@ -10,6 +10,7 @@ import { Party } from './scenes/Party';
 import { Shop } from './scenes/Shop';
 import { Menu } from './scenes/Menu';
 import { HUD } from './scenes/HUD';
+import { Champion } from './scenes/Champion';
 
 //  Find out more information about the Game Config at:
 //  https://newdocs.phaser.io/docs/3.70.0/Phaser.Types.Core.GameConfig
@@ -30,7 +31,8 @@ const config: Phaser.Types.Core.GameConfig = {
         Party,
         Shop,
         Menu,
-        HUD
+        HUD,
+        Champion
     ]
 };
 

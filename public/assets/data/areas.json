@@ -25,7 +25,7 @@
       {"speciesId": "voltcharge", "rarity": 25}
     ],
     "trainers": [
-      {"trainerId": "trainer-1", "name": "Youngster Joey"}
+      {"trainerId": "youngster-joey", "name": "Youngster Joey"}
     ],
     "landmarks": ["Pokémon Center", "Trainer School"]
   },
@@ -42,7 +42,7 @@
       {"speciesId": "mudpupp", "rarity": 25}
     ],
     "trainers": [
-      {"trainerId": "trainer-2", "name": "Lass Bella"}
+      {"trainerId": "lass-bella", "name": "Lass Bella"}
     ],
     "landmarks": ["Forest Shrine", "Tall Grass Field"]
   },
@@ -50,7 +50,7 @@
     "id": "volcanic-caverns",
     "name": "Volcanic Caverns",
     "type": "Fire",
-    "description": "Hot caves filled with lava flows. Dangerous but rich with fire-type critters.",
+    "description": "Hot caves filled with lava flows. A gym leader resides here to test fire trainers.",
     "levelRange": {"min": 15, "max": 25},
     "wildCritters": [
       {"speciesId": "boltiger", "rarity": 30},
@@ -59,15 +59,45 @@
       {"speciesId": "frostwhip", "rarity": 10}
     ],
     "trainers": [
-      {"trainerId": "trainer-3", "name": "Gym Leader Blaze"}
+      {"trainerId": "blaze-leader", "name": "Gym Leader Blaze"}
     ],
-    "landmarks": ["Lava Pools", "Crystal Formations"]
+    "landmarks": ["Lava Pools", "Crystal Formations"],
+    "isGym": true,
+    "gymData": {
+      "id": "gym-volcanic",
+      "name": "Volcanic Gym",
+      "leaderName": "Blaze",
+      "type": "Fire",
+      "description": "A scorching gym where fire burns bright. Defeat Blaze to earn the Volcanic Badge.",
+      "badgeId": "volcanic",
+      "badgeName": "Volcanic Badge",
+      "leaderId": "blaze-leader",
+      "leader": {
+        "id": "blaze-leader",
+        "name": "Blaze",
+        "title": "Gym Leader",
+        "type": "Fire",
+        "badge": "volcanic",
+        "moneyReward": 2000,
+        "party": [
+          {"speciesId": "sparkit", "level": 16},
+          {"speciesId": "embolt", "level": 18}
+        ],
+        "dialogue": {
+          "intro": "I am Blaze, master of fire! Let us see if your critters can withstand the heat!",
+          "victory": "Amazing! Your critters burned with a fury I have rarely seen. You have earned the Volcanic Badge!",
+          "defeat": "The power of fire reigns supreme! Better luck next time!"
+        },
+        "canBattleMultipleTimes": false
+      },
+      "prerequisiteBadges": []
+    }
   },
   {
     "id": "crystal-lake",
     "name": "Crystal Lake",
     "type": "Water",
-    "description": "A pristine lake surrounded by glaciers. Water and ice-type critters gather here.",
+    "description": "A pristine lake surrounded by glaciers. A gym leader challenges trainers here.",
     "levelRange": {"min": 20, "max": 30},
     "wildCritters": [
       {"speciesId": "tidecrown", "rarity": 35},
@@ -76,15 +106,48 @@
       {"speciesId": "frostwhip", "rarity": 20}
     ],
     "trainers": [
-      {"trainerId": "trainer-4", "name": "Gym Leader Marina"}
+      {"trainerId": "marina-leader", "name": "Gym Leader Marina"}
     ],
-    "landmarks": ["Waterfall", "Ice Cavern"]
+    "landmarks": ["Waterfall", "Ice Cavern"],
+    "unlockRequirements": {
+      "badgeId": "volcanic"
+    },
+    "isGym": true,
+    "gymData": {
+      "id": "gym-aquatic",
+      "name": "Crystal Lake Gym",
+      "leaderName": "Marina",
+      "type": "Water",
+      "description": "A serene gym surrounded by water. Defeat Marina to earn the Aquatic Badge.",
+      "badgeId": "aquatic",
+      "badgeName": "Aquatic Badge",
+      "leaderId": "marina-leader",
+      "leader": {
+        "id": "marina-leader",
+        "name": "Marina",
+        "title": "Gym Leader",
+        "type": "Water",
+        "badge": "aquatic",
+        "moneyReward": 2000,
+        "party": [
+          {"speciesId": "aqualis", "level": 21},
+          {"speciesId": "tidecrown", "level": 23}
+        ],
+        "dialogue": {
+          "intro": "Welcome to Crystal Lake! I, Marina, guardian of the waters, shall test your resolve.",
+          "victory": "Your skill flows like the currents themselves! You have earned the Aquatic Badge!",
+          "defeat": "The waters are vast and deep. Perhaps next time you will dive deeper!"
+        },
+        "canBattleMultipleTimes": false
+      },
+      "prerequisiteBadges": ["volcanic"]
+    }
   },
   {
     "id": "psychic-tower",
     "name": "Psychic Tower",
     "type": "Psychic",
-    "description": "A mysterious tower where psychic phenomena occur. Psychic-type critters are strong here.",
+    "description": "A mysterious tower where psychic phenomena occur. A powerful gym leader waits here.",
     "levelRange": {"min": 25, "max": 35},
     "wildCritters": [
       {"speciesId": "mindseer", "rarity": 35},
@@ -93,15 +156,48 @@
       {"speciesId": "radianceking", "rarity": 15}
     ],
     "trainers": [
-      {"trainerId": "trainer-5", "name": "Gym Leader Sage"}
+      {"trainerId": "sage-leader", "name": "Gym Leader Sage"}
     ],
-    "landmarks": ["Tower Peak", "Meditation Chamber"]
+    "landmarks": ["Tower Peak", "Meditation Chamber"],
+    "unlockRequirements": {
+      "badgeId": "aquatic"
+    },
+    "isGym": true,
+    "gymData": {
+      "id": "gym-psychic",
+      "name": "Psychic Tower Gym",
+      "leaderName": "Sage",
+      "type": "Psychic",
+      "description": "A tower resonating with psychic energy. Defeat Sage to earn the Psychic Badge.",
+      "badgeId": "psychic",
+      "badgeName": "Psychic Badge",
+      "leaderId": "sage-leader",
+      "leader": {
+        "id": "sage-leader",
+        "name": "Sage",
+        "title": "Gym Leader",
+        "type": "Psychic",
+        "badge": "psychic",
+        "moneyReward": 2000,
+        "party": [
+          {"speciesId": "psychink", "level": 26},
+          {"speciesId": "mindseer", "level": 28}
+        ],
+        "dialogue": {
+          "intro": "I sense your arrival... Your thoughts are clear. Are your critters equally sharp?",
+          "victory": "Your mind is strong! The Psychic Badge is yours!",
+          "defeat": "Your mental fortitude falters. Meditate and return stronger."
+        },
+        "canBattleMultipleTimes": false
+      },
+      "prerequisiteBadges": ["aquatic"]
+    }
   },
   {
     "id": "electric-quarry",
     "name": "Electric Quarry",
     "type": "Electric",
-    "description": "An ancient quarry where electricity crackles in the air. Electric-type critters thrive here.",
+    "description": "An ancient quarry where electricity crackles in the air. A gym leader challenges you here.",
     "levelRange": {"min": 22, "max": 32},
     "wildCritters": [
       {"speciesId": "voltrix", "rarity": 40},
@@ -109,15 +205,48 @@
       {"speciesId": "voltcharge", "rarity": 30}
     ],
     "trainers": [
-      {"trainerId": "trainer-6", "name": "Gym Leader Voltz"}
+      {"trainerId": "voltz-leader", "name": "Gym Leader Voltz"}
     ],
-    "landmarks": ["Power Generator", "Mineral Deposits"]
+    "landmarks": ["Power Generator", "Mineral Deposits"],
+    "unlockRequirements": {
+      "badgeId": "volcanic"
+    },
+    "isGym": true,
+    "gymData": {
+      "id": "gym-electric",
+      "name": "Electric Quarry Gym",
+      "leaderName": "Voltz",
+      "type": "Electric",
+      "description": "A gym crackling with electricity. Defeat Voltz to earn the Electric Badge.",
+      "badgeId": "electric",
+      "badgeName": "Electric Badge",
+      "leaderId": "voltz-leader",
+      "leader": {
+        "id": "voltz-leader",
+        "name": "Voltz",
+        "title": "Gym Leader",
+        "type": "Electric",
+        "badge": "electric",
+        "moneyReward": 2000,
+        "party": [
+          {"speciesId": "sparkit", "level": 23},
+          {"speciesId": "voltrix", "level": 25}
+        ],
+        "dialogue": {
+          "intro": "Time to feel the power of electricity! Your journey ends here!",
+          "victory": "Shocking! You have earned the Electric Badge! Impressive!",
+          "defeat": "You were no match for the power of thunder!"
+        },
+        "canBattleMultipleTimes": false
+      },
+      "prerequisiteBadges": ["volcanic"]
+    }
   },
   {
     "id": "underground-tunnels",
     "name": "Underground Tunnels",
     "type": "Ground",
-    "description": "Deep underground caverns. Home to ground and rock-type critters.",
+    "description": "Deep underground caverns. A formidable gym leader resides in the depths.",
     "levelRange": {"min": 28, "max": 38},
     "wildCritters": [
       {"speciesId": "terrasmith", "rarity": 35},
@@ -126,15 +255,48 @@
       {"speciesId": "mudpupp", "rarity": 15}
     ],
     "trainers": [
-      {"trainerId": "trainer-7", "name": "Gym Leader Granite"}
+      {"trainerId": "granite-leader", "name": "Gym Leader Granite"}
     ],
-    "landmarks": ["Crystal Caves", "Magma Chamber"]
+    "landmarks": ["Crystal Caves", "Magma Chamber"],
+    "unlockRequirements": {
+      "badgeId": "psychic"
+    },
+    "isGym": true,
+    "gymData": {
+      "id": "gym-earth",
+      "name": "Underground Gym",
+      "leaderName": "Granite",
+      "type": "Ground",
+      "description": "A gym deep in the earth. Defeat Granite to earn the Earth Badge.",
+      "badgeId": "earth",
+      "badgeName": "Earth Badge",
+      "leaderId": "granite-leader",
+      "leader": {
+        "id": "granite-leader",
+        "name": "Granite",
+        "title": "Gym Leader",
+        "type": "Ground",
+        "badge": "earth",
+        "moneyReward": 2000,
+        "party": [
+          {"speciesId": "mudpupp", "level": 29},
+          {"speciesId": "terrasmith", "level": 31}
+        ],
+        "dialogue": {
+          "intro": "The earth trembles beneath my feet! Can your critters stand firm?",
+          "victory": "Your critters are as solid as stone! The Earth Badge is yours!",
+          "defeat": "The ground shall swallow your ambitions!"
+        },
+        "canBattleMultipleTimes": false
+      },
+      "prerequisiteBadges": ["psychic"]
+    }
   },
   {
     "id": "dark-forest",
     "name": "Dark Forest",
     "type": "Dark",
-    "description": "A shadowy forest where darkness prevails. Dark-type critters hide in the shadows.",
+    "description": "A shadowy forest where darkness prevails. A mysterious gym leader dwells here.",
     "levelRange": {"min": 30, "max": 40},
     "wildCritters": [
       {"speciesId": "toxiclaw", "rarity": 35},
@@ -143,15 +305,48 @@
       {"speciesId": "houndrake", "rarity": 35}
     ],
     "trainers": [
-      {"trainerId": "trainer-8", "name": "Gym Leader Shadow"}
+      {"trainerId": "shadow-leader", "name": "Gym Leader Shadow"}
     ],
-    "landmarks": ["Shadow Sanctuary", "Ancient Ruins"]
+    "landmarks": ["Shadow Sanctuary", "Ancient Ruins"],
+    "unlockRequirements": {
+      "badgeId": "electric"
+    },
+    "isGym": true,
+    "gymData": {
+      "id": "gym-shadow",
+      "name": "Dark Forest Gym",
+      "leaderName": "Shadow",
+      "type": "Dark",
+      "description": "A gym shrouded in shadow. Defeat Shadow to earn the Shadow Badge.",
+      "badgeId": "shadow",
+      "badgeName": "Shadow Badge",
+      "leaderId": "shadow-leader",
+      "leader": {
+        "id": "shadow-leader",
+        "name": "Shadow",
+        "title": "Gym Leader",
+        "type": "Dark",
+        "badge": "shadow",
+        "moneyReward": 2000,
+        "party": [
+          {"speciesId": "houndrake", "level": 31},
+          {"speciesId": "toxiclaw", "level": 33}
+        ],
+        "dialogue": {
+          "intro": "Welcome to the darkness... Few escape it! Will you?",
+          "victory": "You have pierced the shadow! The Shadow Badge is yours!",
+          "defeat": "You will remain in darkness!"
+        },
+        "canBattleMultipleTimes": false
+      },
+      "prerequisiteBadges": ["electric"]
+    }
   },
   {
     "id": "fairy-meadow",
     "name": "Fairy Meadow",
     "type": "Fairy",
-    "description": "An enchanted meadow filled with magical energy. Fairy-type critters dance here.",
+    "description": "An enchanted meadow filled with magical energy. The final gym leader waits here.",
     "levelRange": {"min": 35, "max": 45},
     "wildCritters": [
       {"speciesId": "radianceking", "rarity": 40},
@@ -160,15 +355,48 @@
       {"speciesId": "verdaxe", "rarity": 20}
     ],
     "trainers": [
-      {"trainerId": "trainer-9", "name": "Gym Leader Aurora"}
+      {"trainerId": "aurora-leader", "name": "Gym Leader Aurora"}
     ],
-    "landmarks": ["Enchanted Garden", "Fairy Ring"]
+    "landmarks": ["Enchanted Garden", "Fairy Ring"],
+    "unlockRequirements": {
+      "badgeId": "earth"
+    },
+    "isGym": true,
+    "gymData": {
+      "id": "gym-fairy",
+      "name": "Fairy Meadow Gym",
+      "leaderName": "Aurora",
+      "type": "Fairy",
+      "description": "A magical gym resonating with fairy power. Defeat Aurora to earn the Fairy Badge.",
+      "badgeId": "fairy",
+      "badgeName": "Fairy Badge",
+      "leaderId": "aurora-leader",
+      "leader": {
+        "id": "aurora-leader",
+        "name": "Aurora",
+        "title": "Gym Leader",
+        "type": "Fairy",
+        "badge": "fairy",
+        "moneyReward": 2000,
+        "party": [
+          {"speciesId": "lightbringer", "level": 36},
+          {"speciesId": "radianceking", "level": 38}
+        ],
+        "dialogue": {
+          "intro": "The magic of fairies flows through me! Let us dance in battle!",
+          "victory": "Your magic shines brightly! The Fairy Badge is yours!",
+          "defeat": "My enchantments are too strong for you."
+        },
+        "canBattleMultipleTimes": false
+      },
+      "prerequisiteBadges": ["earth"]
+    }
   },
   {
     "id": "legendary-peak",
     "name": "Legendary Peak",
     "type": "Fire",
-    "description": "The highest peak in the region. Legendary critters are said to dwell here.",
+    "description": "The highest peak in the region. The Champion awaits those who have collected all badges.",
     "levelRange": {"min": 45, "max": 55},
     "wildCritters": [
       {"speciesId": "infernus", "rarity": 40},
@@ -176,8 +404,13 @@
       {"speciesId": "natureveil", "rarity": 20}
     ],
     "trainers": [
-      {"trainerId": "champion", "name": "Champion"}
+      {"trainerId": "champion", "name": "Champion Alex"}
     ],
-    "landmarks": ["Summit", "Sacred Shrine"]
+    "landmarks": ["Summit", "Sacred Shrine"],
+    "unlockRequirements": {
+      "badgeId": "fairy"
+    },
+    "isGym": false,
+    "gymData": null
   }
 ]

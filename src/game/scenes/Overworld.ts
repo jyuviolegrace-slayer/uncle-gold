@@ -5,6 +5,8 @@ import MapManager, { IMapData } from '../managers/MapManager';
 import MapRenderer from '../managers/MapRenderer';
 import { PlayerController } from '../managers/PlayerController';
 import { EncounterSystem } from '../managers/EncounterSystem';
+import { DataLoader } from '../data/loader';
+import { IArea } from '../models/types';
 
 /**
  * Overworld Scene - Main exploration and navigation scene
@@ -20,6 +22,8 @@ export class Overworld extends Scene {
   private encounterSystem: EncounterSystem | null = null;
   private npcSprites: Map<string, Physics.Arcade.Sprite> = new Map();
   private trainerSprites: Map<string, Physics.Arcade.Sprite> = new Map();
+  private areas: Map<string, IArea> = new Map();
+  private currentArea: IArea | null = null;
 
   constructor() {
     super('Overworld');
@@ -33,6 +37,9 @@ export class Overworld extends Scene {
 
   async create() {
     try {
+      // Load areas data
+      await this.loadAreasData();
+
       // Load map data
       this.mapData = await MapManager.loadMap(this.mapId);
 
@@ -65,6 +72,22 @@ export class Overworld extends Scene {
       console.error('Error creating Overworld scene:', error);
       // Fallback to main menu
       this.scene.start('MainMenu');
+    }
+  }
+
+  private async loadAreasData() {
+    try {
+      const areasData = await DataLoader.loadAreas();
+      for (const area of areasData) {
+        this.areas.set(area.id, area);
+      }
+
+      const playerArea = this.areas.get(this.mapId);
+      if (playerArea) {
+        this.currentArea = playerArea;
+      }
+    } catch (error) {
+      console.error('Error loading areas data:', error);
     }
   }
 
@@ -257,12 +280,52 @@ export class Overworld extends Scene {
 
       if (distance < interactionRadius) {
         const trainerData = trainerSprite.getData('trainerData');
-        EventBus.emit('trainer:challenge', {
-          trainerId: trainerData.trainerId,
-          trainerName: trainerData.name,
-        });
+        const alreadyDefeated = this.gameStateManager.hasDefeatedTrainer(trainerData.trainerId);
+
+        if (alreadyDefeated) {
+          EventBus.emit('trainer:defeated', {
+            trainerId: trainerData.trainerId,
+            trainerName: trainerData.name,
+          });
+        } else {
+          this.initiateTrainerBattle(trainerData.trainerId, trainerData.name);
+        }
       }
     });
+  }
+
+  private initiateTrainerBattle(trainerId: string, trainerName: string) {
+    const area = this.currentArea;
+    if (!area) return;
+
+    let trainerData = area.trainers.find(t => t.trainerId === trainerId);
+    if (!trainerData) {
+      trainerData = { trainerId, name: trainerName };
+    }
+
+    this.startBattle({
+      encounterType: 'trainer',
+      trainerId,
+      trainerName: trainerData.name,
+      isTrainerBattle: true,
+    });
+  }
+
+  private checkAreaAccessible(areaId: string): boolean {
+    const area = this.areas.get(areaId);
+    if (!area || !area.unlockRequirements) return true;
+
+    const reqs = area.unlockRequirements;
+
+    if (reqs.badgeId && !this.gameStateManager.hasBadge(reqs.badgeId)) {
+      return false;
+    }
+
+    if (reqs.minLevel && this.gameStateManager.getParty().some(c => c.level < reqs.minLevel!)) {
+      return false;
+    }
+
+    return true;
   }
 
   private setupEventListeners() {
