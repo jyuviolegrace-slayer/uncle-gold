@@ -1,0 +1,25 @@
+[
+  {
+    "id": "potion",
+    "name": "Potion",
+    "description": "A basic healing item that will heal 30 HP from a single critter.",
+    "type": "Potion",
+    "effect": {
+      "type": "heal",
+      "value": 30
+    },
+    "legacyId": 1,
+    "legacyCategory": "HEAL",
+    "legacyEffect": "HEAL_30"
+  },
+  {
+    "id": "pokeball",
+    "name": "Pokéball",
+    "description": "A capture orb from the legacy world.",
+    "type": "Pokeball",
+    "catchModifier": 1.0,
+    "legacyId": 2,
+    "legacyCategory": "CAPTURE",
+    "legacyEffect": "CAPTURE_1"
+  }
+]

@@ -1,0 +1,22 @@
+{
+  "monsterIdMap": {
+    "1": "iguanignite",
+    "2": "carnodusk",
+    "3": "ignivolt",
+    "4": "aquavalor",
+    "5": "frostsaber"
+  },
+  "attackIdMap": {
+    "1": "ice-shard",
+    "2": "slash"
+  },
+  "itemIdMap": {
+    "1": "potion",
+    "2": "pokeball"
+  },
+  "areaIdMap": {
+    "1": "route-1",
+    "2": "route-2",
+    "3": "forest-area"
+  }
+}

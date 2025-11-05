@@ -4,6 +4,7 @@
 
 // Type definitions
 export * from './types';
+export * from './legacyTypes';
 
 // Classes and utilities
 export { Critter } from './Critter';

@@ -1,0 +1,47 @@
+[
+  {
+    "id": "sign-1",
+    "message": "TRAINER TIPS\nIf you want to avoid battles, stay away from grassy areas!",
+    "legacyId": "1"
+  },
+  {
+    "id": "sign-2",
+    "message": "CRITTER FAN CLUB\nAll Critter fans welcome!",
+    "legacyId": "2"
+  },
+  {
+    "id": "sign-3",
+    "message": "For poison, use ANTIDOTE! Get it at the MARKET!",
+    "legacyId": "3"
+  },
+  {
+    "id": "sign-4",
+    "message": "Don't leave home without a MAP!",
+    "legacyId": "4"
+  },
+  {
+    "id": "sign-5",
+    "message": "Watch out!\nSome trainers will battle\nyou on sight.",
+    "legacyId": "5"
+  },
+  {
+    "id": "sign-6",
+    "message": "Welcome to new city!",
+    "legacyId": "6"
+  },
+  {
+    "id": "sign-7",
+    "message": "New items in stock!",
+    "legacyId": "7"
+  },
+  {
+    "id": "sign-8",
+    "message": "Rest here",
+    "legacyId": "8"
+  },
+  {
+    "id": "sign-9",
+    "message": "Spooky Forest",
+    "legacyId": "9"
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "ice-shard",
+    "name": "Ice Shard",
+    "type": "Water",
+    "power": 40,
+    "accuracy": 100,
+    "basePP": 30,
+    "category": "Physical",
+    "legacyId": 1,
+    "legacyAnimationName": "ICE_SHARD",
+    "legacyAudioKey": "ICE"
+  },
+  {
+    "id": "slash",
+    "name": "Slash",
+    "type": "Fire",
+    "power": 70,
+    "accuracy": 100,
+    "basePP": 20,
+    "category": "Physical",
+    "legacyId": 2,
+    "legacyAnimationName": "SLASH",
+    "legacyAudioKey": "CLAW"
+  }
+]
