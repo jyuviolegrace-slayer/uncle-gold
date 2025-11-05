@@ -54,11 +54,6 @@ export class MonsterParty extends Scene {
   private legacyDataManager: LegacyDataManager;
 
   // Layout constants
-
-  constructor() {
-    super('MonsterParty');
-    this.legacyDataManager = new LegacyDataManager();
-  }
   private readonly MONSTER_PARTY_POSITIONS = {
     EVEN: { x: 0, y: 10 },
     ODD: { x: 510, y: 40 },
@@ -73,6 +68,7 @@ export class MonsterParty extends Scene {
 
   constructor() {
     super('MonsterParty');
+    this.legacyDataManager = new LegacyDataManager();
     this.sceneData = { previousSceneName: 'Overworld' };
   }
 

@@ -54,11 +54,6 @@ export class Inventory extends Scene {
   private waitingForInput: boolean = false;
   private legacyDataManager: LegacyDataManager;
 
-  constructor() {
-    super('Inventory');
-    this.legacyDataManager = new LegacyDataManager();
-  }
-
   // Layout constants
   private readonly INVENTORY_ITEM_POSITION = {
     x: 50,

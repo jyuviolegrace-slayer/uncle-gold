@@ -370,14 +370,6 @@ export class Preloader extends Scene {
                 this.progressText.setText('Initializing save system...');
             }
 
-            // Initialize SaveManager singleton
-            const saveManager = SaveManager.getInstance();
-            this.game.registry.set('saveManager', saveManager);
-
-            // Initialize LegacyDataManager
-            const legacyDataManager = new LegacyDataManager();
-            this.game.registry.set('legacyDataManager', legacyDataManager);
-
             if (this.progressText) {
                 this.progressText.setText('Ready!');
             }

@@ -50,10 +50,9 @@ export class MonsterDetails extends Scene {
       currentHP: 1,
       maxHP: 1,
       experience: 0,
-      experienceToNext: 100,
       isFainted: false,
       moves: [],
-      currentStats: {
+      baseStats: {
         hp: 1,
         attack: 1,
         defense: 1,
@@ -61,13 +60,13 @@ export class MonsterDetails extends Scene {
         spDef: 1,
         speed: 1,
       },
-      ivs: {
-        hp: 0,
-        attack: 0,
-        defense: 0,
-        spAtk: 0,
-        spDef: 0,
-        speed: 0,
+      currentStats: {
+        hp: 1,
+        attack: 1,
+        defense: 1,
+        spAtk: 1,
+        spDef: 1,
+        speed: 1,
       },
     };
   }
@@ -151,8 +150,9 @@ export class MonsterDetails extends Scene {
     y += 40;
 
     // Experience Bar
-    const expProgress = this.monsterDetails.experience / this.monsterDetails.experienceToNext;
-    this.createStatBar(20, y, 'EXP', this.monsterDetails.experience, this.monsterDetails.experienceToNext, 0x00FF00, expProgress);
+    const expForNextLevel = Math.floor((4 * Math.pow(this.monsterDetails.level + 1, 3)) / 5);
+    const expProgress = this.monsterDetails.experience / expForNextLevel;
+    this.createStatBar(20, y, 'EXP', this.monsterDetails.experience, expForNextLevel, 0x00FF00, expProgress);
     y += 60;
 
     // Stats title
