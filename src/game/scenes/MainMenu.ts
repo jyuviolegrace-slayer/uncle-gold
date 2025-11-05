@@ -53,7 +53,7 @@ export class MainMenu extends Scene
             if (gameStateManager.hasSaveData()) {
                 gameStateManager.loadGame();
                 SceneContext.initialize(gameStateManager);
-                this.scene.start('Overworld', { entryPoint: gameStateManager.getPlayerState().currentArea });
+                this.scene.start('Overworld', { mapId: gameStateManager.getPlayerState().currentArea });
             }
         });
 
@@ -136,7 +136,7 @@ export class MainMenu extends Scene
         gameStateManager.addItem('pokeball', 5);
         gameStateManager.addItem('potion', 3);
 
-        this.scene.start('Overworld', { entryPoint: 'starter-town' });
+        this.scene.start('Overworld', { mapId: 'starter-town' });
     }
     
     changeScene ()

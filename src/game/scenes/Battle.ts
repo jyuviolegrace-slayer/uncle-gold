@@ -2,7 +2,7 @@ import { Scene, GameObjects, Physics, Input } from 'phaser';
 import { EventBus } from '../EventBus';
 import { SceneContext } from './SceneContext';
 import { BattleManager, Critter, MoveDatabase, CritterSpeciesDatabase, ICritter, ItemDatabase, TrainerDatabase } from '../models';
-import { AnimationManager } from '../managers/AnimationManager';
+import { AnimationManager, PoolManager, DamageNumber } from '../managers';
 
 interface BattleUIElements {
   playerSpriteContainer: GameObjects.Container | null;
@@ -27,6 +27,7 @@ export class Battle extends Scene {
   private battleManager: BattleManager | null = null;
   private gameStateManager = SceneContext.getInstance().getGameStateManager();
   private animationManager: AnimationManager | null = null;
+  private poolManager: PoolManager | null = null;
 
   private ui: BattleUIElements = {
     playerSpriteContainer: null,
@@ -59,6 +60,8 @@ export class Battle extends Scene {
 
   create() {
     this.animationManager = new AnimationManager(this);
+    this.poolManager = new PoolManager(this);
+    this.poolManager.createPool('damageNumber', DamageNumber, { maxSize: 20 });
 
     try {
       this.setupBattle();
@@ -906,6 +909,9 @@ export class Battle extends Scene {
   shutdown() {
     if (this.animationManager) {
       this.animationManager.destroy();
+    }
+    if (this.poolManager) {
+      this.poolManager.clearAllPools();
     }
   }
 }
