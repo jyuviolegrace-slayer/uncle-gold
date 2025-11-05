@@ -3,6 +3,8 @@
  * Handles map file loading and rendering
  */
 
+import Phaser from 'phaser';
+
 export type ObjectType = 'building' | 'tree' | 'rock' | 'sign' | 'door' | 'flower' | 'fence' | 'water' | 'bridge' | 'other';
 export type POIType = 'shop' | 'pokecenter' | 'gym' | 'pokedex' | 'house' | 'landmark' | 'other';
 
@@ -61,6 +63,17 @@ export interface IGroundItem {
   quantity?: number;
 }
 
+export interface IEntrance {
+  id: string;
+  name?: string;
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
+  connectsTo?: string;
+  entranceId?: string;
+}
+
 export interface IMapData {
   id: string;
   name: string;
@@ -77,6 +90,7 @@ export interface IMapData {
   objects?: IMapObject[];
   pointsOfInterest?: IPointOfInterest[];
   groundItems?: IGroundItem[];
+  entrances?: IEntrance[];
 }
 
 export class MapManager {

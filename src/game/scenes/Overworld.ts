@@ -1,4 +1,4 @@
-import { Scene, GameObjects, Physics } from 'phaser';
+import { Scene, GameObjects, Physics, Input } from 'phaser';
 import { EventBus } from '../EventBus';
 import { SceneContext } from './SceneContext';
 import MapManager, { IMapData, IMapObject, IPointOfInterest } from '../managers/MapManager';
@@ -7,10 +7,20 @@ import { PlayerController } from '../managers/PlayerController';
 import { EncounterSystem } from '../managers/EncounterSystem';
 import { DataLoader } from '../data/loader';
 import { IArea } from '../models/types';
+import {
+  Player,
+  NPC,
+  Item,
+  WorldMenu,
+  EventZoneManager,
+  type Direction,
+  type Coordinate,
+  calculateDistance,
+} from '../world';
 
 /**
  * Overworld Scene - Main exploration and navigation scene
- * Handles player movement, tilemap rendering, collisions, wild encounters, and NPC interactions
+ * Handles player movement, tilemap rendering, collisions, wild encounters, NPC interactions
  */
 export class Overworld extends Scene {
   private player: Physics.Arcade.Sprite | null = null;
@@ -26,6 +36,12 @@ export class Overworld extends Scene {
   private currentArea: IArea | null = null;
   private poiSprites: Map<string, Phaser.GameObjects.Rectangle> = new Map();
   private objectSprites: Map<string, Phaser.GameObjects.Rectangle> = new Map();
+  private worldMenu: WorldMenu | null = null;
+  private eventZoneManager: EventZoneManager | null = null;
+  private npcs: NPC[] = [];
+  private items: Item[] = [];
+  private lastInteractionTime: number = 0;
+  private interactionCooldown: number = 500;
 
   constructor() {
     super('Overworld');
@@ -62,6 +78,12 @@ export class Overworld extends Scene {
 
       // Setup objects and POIs
       this.setupObjectsAndPOIs();
+
+      // Setup event zones
+      this.setupEventZones();
+
+      // Setup world menu
+      this.setupWorldMenu();
 
       // Setup input
       this.setupInput();
@@ -265,7 +287,108 @@ export class Overworld extends Scene {
     }
   }
 
+  private setupEventZones() {
+    this.eventZoneManager = new EventZoneManager(this, false);
+
+    // Add entrance zones from map data
+    if (this.mapData?.entrances) {
+      this.mapData.entrances.forEach(entrance => {
+        this.eventZoneManager?.addZone({
+          id: entrance.id,
+          name: entrance.name || 'Entrance',
+          x: entrance.x * this.mapData!.tileSize,
+          y: entrance.y * this.mapData!.tileSize,
+          width: (entrance.width || 1) * this.mapData!.tileSize,
+          height: (entrance.height || 1) * this.mapData!.tileSize,
+          type: 'entrance',
+          data: entrance,
+        });
+      });
+    }
+  }
+
+  private setupWorldMenu() {
+    this.worldMenu = new WorldMenu(this);
+    this.worldMenu.setOnOptionSelected(this.handleMenuOption.bind(this));
+  }
+
+  private handleMenuOption(option: string) {
+    switch (option) {
+      case 'PARTY':
+        if (this.worldMenu) {
+          this.worldMenu.hide();
+        }
+        this.scene.pause();
+        this.scene.launch('Party', { previousScene: 'Overworld' });
+        break;
+      case 'BAG':
+        if (this.worldMenu) {
+          this.worldMenu.hide();
+        }
+        // Open inventory (requires Inventory scene)
+        EventBus.emit('menu:bag-open');
+        break;
+      case 'SAVE':
+        if (this.worldMenu) {
+          this.worldMenu.hide();
+        }
+        this.gameStateManager.saveGame();
+        EventBus.emit('game:saved');
+        break;
+      case 'OPTIONS':
+        if (this.worldMenu) {
+          this.worldMenu.hide();
+        }
+        // Open options (requires Options scene)
+        EventBus.emit('menu:options-open');
+        break;
+      case 'EXIT':
+        if (this.worldMenu) {
+          this.worldMenu.hide();
+        }
+        this.scene.start('MainMenu');
+        break;
+    }
+  }
+
   private setupInput() {
+    // Menu toggle with ENTER
+    this.input.keyboard?.on('keydown-ENTER', () => {
+      if (this.worldMenu) {
+        this.worldMenu.toggle();
+      }
+    });
+
+    // Menu navigation
+    this.input.keyboard?.on('keydown-UP', () => {
+      if (this.worldMenu?.getIsVisible()) {
+        this.worldMenu.handleInput('UP');
+      }
+    });
+
+    this.input.keyboard?.on('keydown-DOWN', () => {
+      if (this.worldMenu?.getIsVisible()) {
+        this.worldMenu.handleInput('DOWN');
+      }
+    });
+
+    // Menu confirm with Z
+    this.input.keyboard?.on('keydown-Z', () => {
+      if (this.worldMenu?.getIsVisible()) {
+        this.worldMenu.handleInput('CONFIRM');
+      } else {
+        this.checkNearbyInteractions();
+      }
+    });
+
+    // Menu cancel with X
+    this.input.keyboard?.on('keydown-X', () => {
+      if (this.worldMenu?.getIsVisible()) {
+        this.worldMenu.handleInput('CANCEL');
+      }
+    });
+
+    // Legacy keybinds for quick access
     this.input.keyboard?.on('keydown-M', () => {
       this.scene.pause();
       this.scene.launch('Menu', { previousScene: 'Overworld' });
@@ -438,6 +561,11 @@ export class Overworld extends Scene {
       this.playerController.stop();
       this.encounterSystem.triggerWildEncounter(this.mapId);
     }
+
+    // Check event zones
+    if (this.eventZoneManager) {
+      this.eventZoneManager.checkPlayerInZone({ x: this.player.x, y: this.player.y }, 32);
+    }
   }
 
   shutdown() {
@@ -446,10 +574,31 @@ export class Overworld extends Scene {
     EventBus.off('open-menu');
     EventBus.off('open-party');
     EventBus.off('open-shop');
+    EventBus.off('zone:entrance-enter');
+    EventBus.off('zone:event-trigger');
+    EventBus.off('zone:warp-trigger');
+    EventBus.off('zone:interaction-enter');
+    EventBus.off('zone:exit');
 
     if (this.playerController) {
       this.playerController.shutdown();
     }
+
+    if (this.worldMenu) {
+      this.worldMenu.destroy();
+    }
+
+    if (this.eventZoneManager) {
+      this.eventZoneManager.destroy();
+    }
+
+    // Clean up NPCs
+    this.npcs.forEach(npc => npc.destroy());
+    this.npcs = [];
+
+    // Clean up items
+    this.items.forEach(item => item.remove());
+    this.items = [];
 
     this.npcSprites.clear();
     this.trainerSprites.clear();
