@@ -13,3 +13,6 @@ export { GameStateManager } from './GameStateManager';
 export { MoveDatabase } from './MoveDatabase';
 export { CritterSpeciesDatabase } from './CritterSpeciesDatabase';
 export { AIDecisionMaker } from './AIDecisionMaker';
+export { PlayerParty } from './PlayerParty';
+export { MoveLearningManager } from './MoveLearningManager';
+export { EvolutionManager, type IEvolution } from './EvolutionManager';

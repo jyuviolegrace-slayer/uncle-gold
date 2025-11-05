@@ -441,4 +441,44 @@ export class BattleManager {
 
     return Math.random() < fleeChance;
   }
+
+  /**
+   * Check for move learning after level up
+   */
+  checkMoveLearning(critter: ICritter): void {
+    const { MoveLearningManager } = require('./MoveLearningManager');
+    const newMoves = MoveLearningManager.hasNewMoveToLearn(critter);
+    
+    if (newMoves.length > 0) {
+      EventBus.emit('movelearning:available', {
+        critterId: critter.id,
+        moves: newMoves,
+      });
+    }
+  }
+
+  /**
+   * Check for evolution after level up
+   */
+  checkEvolution(critter: ICritter): void {
+    const { EvolutionManager } = require('./EvolutionManager');
+    const evolution = EvolutionManager.canEvolve(critter);
+    
+    if (evolution) {
+      EventBus.emit('evolution:prompt', {
+        critterId: critter.id,
+        fromSpecies: evolution.from,
+        toSpecies: evolution.to,
+        requirement: evolution.requirement,
+      });
+    }
+  }
+
+  /**
+   * Check both move learning and evolution after level up
+   */
+  checkPostLevelUpEvents(critter: ICritter): void {
+    this.checkMoveLearning(critter);
+    this.checkEvolution(critter);
+  }
 }
