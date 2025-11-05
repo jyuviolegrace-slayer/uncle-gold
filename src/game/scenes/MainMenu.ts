@@ -16,6 +16,10 @@ export class MainMenu extends Scene
     starterChoosing: boolean = false;
     selectionIndicator: GameObjects.Rectangle | null = null;
     isConfirming: boolean = false;
+    zKeyJustPressed: boolean = false;
+    keyZ: Phaser.Input.Keyboard.Key | null = null;
+    keyLeft: Phaser.Input.Keyboard.Key | null = null;
+    keyRight: Phaser.Input.Keyboard.Key | null = null;
 
     constructor ()
     {
@@ -42,6 +46,18 @@ export class MainMenu extends Scene
         this.setupInput();
 
         EventBus.emit('current-scene-ready', this);
+    }
+
+    update()
+    {
+        // Fallback keyboard checking for Z key using JustDown
+        if (this.starterChoosing && !this.isConfirming && this.keyZ) {
+            if (Phaser.Input.Keyboard.JustDown(this.keyZ)) {
+                console.log('Z key detected via JustDown method');
+                this.isConfirming = true;
+                this.selectStarter();
+            }
+        }
     }
 
     private setupInput()
@@ -73,12 +89,27 @@ export class MainMenu extends Scene
             }
         });
 
-        this.input.keyboard?.on('keydown-z', () => {
+        const handleZKeyPress = () => {
+            console.log('Z key pressed. starterChoosing:', this.starterChoosing, 'isConfirming:', this.isConfirming);
             if (this.starterChoosing && !this.isConfirming) {
+                console.log('Z key confirmed - calling selectStarter()');
                 this.isConfirming = true;
                 this.selectStarter();
+            } else {
+                console.log('Z key ignored - conditions not met');
             }
-        });
+        };
+
+        this.input.keyboard?.on('keydown-z', handleZKeyPress);
+        this.input.keyboard?.on('keydown-Z', handleZKeyPress);
+
+        // Also add keyboard key references for robust input handling
+        if (this.input.keyboard) {
+            this.keyZ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
+            this.keyLeft = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
+            this.keyRight = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+            console.log('Keyboard keys registered: Z, LEFT, RIGHT');
+        }
     }
 
     private showStarterSelection()
@@ -154,21 +185,38 @@ export class MainMenu extends Scene
 
     private selectStarter()
     {
-        const starters = ['embolt', 'aqualis', 'thornwick'];
-        const starterId = starters[this.selectedStarterIndex];
+        try {
+            const starters = ['embolt', 'aqualis', 'thornwick'];
+            const starterId = starters[this.selectedStarterIndex];
+            console.log('Selected starter:', starterId, 'at index', this.selectedStarterIndex);
 
-        const gameStateManager = new GameStateManager('Player');
-        SceneContext.initialize(gameStateManager);
+            const gameStateManager = new GameStateManager('Player');
+            console.log('GameStateManager created');
+            
+            SceneContext.initialize(gameStateManager);
+            console.log('SceneContext initialized');
 
-        const starterCritter = new Critter(starterId, 5);
-        gameStateManager.addCritterToParty(starterCritter);
-        gameStateManager.addMoney(1000);
+            const starterCritter = new Critter(starterId, 5);
+            console.log('Critter created:', starterCritter.speciesId);
+            
+            gameStateManager.addCritterToParty(starterCritter);
+            console.log('Critter added to party');
+            
+            gameStateManager.addMoney(1000);
+            console.log('Money added');
 
-        // Add starting items
-        gameStateManager.addItem('pokeball', 5);
-        gameStateManager.addItem('potion', 3);
+            // Add starting items
+            gameStateManager.addItem('pokeball', 5);
+            gameStateManager.addItem('potion', 3);
+            console.log('Starting items added');
 
-        this.scene.start('Overworld', { mapId: 'starter-town' });
+            console.log('Starting Overworld scene...');
+            this.scene.start('Overworld', { mapId: 'starter-town' });
+            console.log('Scene started successfully');
+        } catch (error) {
+            console.error('Error in selectStarter:', error);
+            this.isConfirming = false;
+        }
     }
     
     changeScene ()
