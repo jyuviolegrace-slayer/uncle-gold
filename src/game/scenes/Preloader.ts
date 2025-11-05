@@ -37,6 +37,12 @@ export class Preloader extends Scene
 
         this.load.image('logo', 'logo.png');
         this.load.image('star', 'star.png');
+
+        // Load player spritesheet
+        this.load.spritesheet('player-brawler', 'animations/brawler48x48.png', {
+            frameWidth: 48,
+            frameHeight: 48
+        });
     }
 
     async create ()
