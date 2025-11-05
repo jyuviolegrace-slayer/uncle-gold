@@ -8,6 +8,25 @@ const ASSETS_TO_CACHE = [
   '/assets/star.png',
   '/assets/logo.png',
   '/assets/bg.png',
+  '/assets/brawler48x48.png',
+  // Data files
+  '/assets/data/areas.json',
+  '/assets/data/critters.json',
+  '/assets/data/items.json',
+  '/assets/data/moves.json',
+  '/assets/data/types.json',
+  '/assets/data/legacy-critters.json',
+  '/assets/data/legacy-encounters.json',
+  '/assets/data/legacy-events.json',
+  '/assets/data/legacy-id-mappings.json',
+  '/assets/data/legacy-items.json',
+  '/assets/data/legacy-moves.json',
+  '/assets/data/legacy-npcs.json',
+  '/assets/data/legacy-signs.json',
+  // Map files
+  '/assets/maps/starter-town.json',
+  '/assets/maps/central-plaza.json',
+  '/assets/maps/mountain-pass.json',
 ];
 
 // Install event: cache critical assets

@@ -130,7 +130,7 @@ export const MobileControls: React.FC<MobileControlsProps> = ({ isMobile = false
 
     const handlePause = (e: React.TouchEvent | React.MouseEvent) => {
         e.preventDefault();
-        EventBus.emit('menu:open');
+        EventBus.emit('menu:open', { menuType: 'pause' });
     };
 
     return (
