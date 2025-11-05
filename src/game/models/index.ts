@@ -12,3 +12,4 @@ export { BattleManager } from './BattleManager';
 export { GameStateManager } from './GameStateManager';
 export { MoveDatabase } from './MoveDatabase';
 export { CritterSpeciesDatabase } from './CritterSpeciesDatabase';
+export { AIDecisionMaker } from './AIDecisionMaker';
