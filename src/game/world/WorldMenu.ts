@@ -1,59 +1,82 @@
 import { Scene, GameObjects } from 'phaser';
 
-export type MenuOption = 'PARTY' | 'BAG' | 'SAVE' | 'OPTIONS' | 'EXIT';
+export type MenuOption = 'MONSTERS' | 'BAG' | 'SAVE' | 'OPTIONS' | 'EXIT';
 
 /**
- * Pause menu system for the overworld
+ * World Menu - Simplified version matching legacy functionality
  */
 export class WorldMenu {
   private scene: Scene;
-  private isVisible: boolean = false;
-  private selectedIndex: number = 0;
-  private menuOptions: MenuOption[] = ['PARTY', 'BAG', 'SAVE', 'OPTIONS', 'EXIT'];
-  private menuContainer?: GameObjects.Container;
-  private menuTexts: Map<MenuOption, GameObjects.Text> = new Map();
-  private onOptionSelected?: (option: MenuOption) => void;
+  public isVisible: boolean = false;
+  private selectedMenuOptionIndex: number = 0;
+  private availableMenuOptions: MenuOption[] = ['MONSTERS', 'BAG', 'SAVE', 'OPTIONS', 'EXIT'];
+  private menuOptionsTextGameObjects: GameObjects.Text[] = [];
+  private container: GameObjects.Container;
+  private userInputCursor: GameObjects.Image;
+  public currentSelectedMenuOption: MenuOption = 'MONSTERS';
 
   constructor(scene: Scene) {
     this.scene = scene;
+    
+    const padding = 4;
+    const width = 300;
+    const height = 10 + padding * 2 + this.availableMenuOptions.length * 50;
+
+    // Create graphics
+    const graphics = this.scene.add.graphics();
+    graphics.fillStyle(0x000000, 0.9);
+    graphics.fillRect(1, 0, width - 1, height - 1);
+    graphics.lineStyle(8, 0xffffff, 1);
+    graphics.strokeRect(0, 0, width, height);
+
+    // Create container
+    this.container = this.scene.add.container(0, 0, [graphics]);
+
+    // Add menu options
+    for (let i = 0; i < this.availableMenuOptions.length; i += 1) {
+      const y = 10 + 50 * i + padding;
+      const textObj = this.scene.add.text(40 + padding, y, this.availableMenuOptions[i], {
+        fontFamily: 'Arial',
+        color: '#FFFFFF',
+        fontSize: '32px',
+      });
+      this.menuOptionsTextGameObjects.push(textObj);
+      this.container.add(textObj);
+    }
+
+    // Add cursor
+    this.userInputCursor = this.scene.add.image(20 + padding, 28 + padding, 'star');
+    this.userInputCursor.setScale(2.5);
+    this.container.add(this.userInputCursor);
+
+    this.hide();
   }
 
-  /**
-   * Show menu
-   */
+  get getIsVisible(): boolean {
+    return this.isVisible;
+  }
+
+  get selectedMenuOption(): MenuOption {
+    return this.currentSelectedMenuOption;
+  }
+
   show(): void {
-    if (this.isVisible) return;
+    const { right, top } = this.scene.cameras.main.worldView;
+    const startX = right - 8 - 300; // padding * 2 + width
+    const startY = top + 8; // padding * 2
 
+    this.container.setPosition(startX, startY);
+    this.container.setAlpha(1);
     this.isVisible = true;
-    this.selectedIndex = 0;
-
-    // Create menu UI if not exists
-    if (!this.menuContainer) {
-      this.createMenuUI();
-    }
-
-    if (this.menuContainer) {
-      this.menuContainer.setVisible(true);
-      this.updateMenuDisplay();
-    }
   }
 
-  /**
-   * Hide menu
-   */
   hide(): void {
-    if (!this.isVisible) return;
-
+    this.container.setAlpha(0);
+    this.selectedMenuOptionIndex = 0;
+    this.moveMenuCursor('NONE');
     this.isVisible = false;
-
-    if (this.menuContainer) {
-      this.menuContainer.setVisible(false);
-    }
   }
 
-  /**
-   * Toggle menu visibility
-   */
   toggle(): void {
     if (this.isVisible) {
       this.hide();
@@ -62,114 +85,53 @@ export class WorldMenu {
     }
   }
 
-  /**
-   * Get visible state
-   */
-  getIsVisible(): boolean {
-    return this.isVisible;
+  handlePlayerInput(input: 'UP' | 'DOWN' | 'OK' | 'CANCEL'): void {
+    if (input === 'CANCEL') {
+      this.hide();
+      return;
+    }
+
+    if (input === 'OK') {
+      this.handleSelectedMenuOption();
+      return;
+    }
+
+    this.moveMenuCursor(input);
   }
 
-  /**
-   * Get current selected option
-   */
-  getSelectedOption(): MenuOption {
-    return this.menuOptions[this.selectedIndex];
+  handleInput(input: 'UP' | 'DOWN' | 'OK' | 'CANCEL'): void {
+    this.handlePlayerInput(input);
   }
 
-  /**
-   * Handle input
-   */
-  handleInput(input: 'UP' | 'DOWN' | 'CONFIRM' | 'CANCEL'): void {
-    if (!this.isVisible) return;
-
-    switch (input) {
+  private moveMenuCursor(direction: 'UP' | 'DOWN' | 'NONE'): void {
+    switch (direction) {
       case 'UP':
-        this.selectedIndex = (this.selectedIndex - 1 + this.menuOptions.length) % this.menuOptions.length;
-        this.updateMenuDisplay();
+        this.selectedMenuOptionIndex -= 1;
+        if (this.selectedMenuOptionIndex < 0) {
+          this.selectedMenuOptionIndex = this.availableMenuOptions.length - 1;
+        }
         break;
       case 'DOWN':
-        this.selectedIndex = (this.selectedIndex + 1) % this.menuOptions.length;
-        this.updateMenuDisplay();
+        this.selectedMenuOptionIndex += 1;
+        if (this.selectedMenuOptionIndex > this.availableMenuOptions.length - 1) {
+          this.selectedMenuOptionIndex = 0;
+        }
         break;
-      case 'CONFIRM':
-        this.onOptionSelected?.(this.menuOptions[this.selectedIndex]);
-        break;
-      case 'CANCEL':
-        this.hide();
+      case 'NONE':
         break;
     }
+    
+    const x = 20 + 4; // 20 + padding
+    const y = 28 + 4 + this.selectedMenuOptionIndex * 50; // 28 + padding + index * 50
+
+    this.userInputCursor.setPosition(x, y);
   }
 
-  /**
-   * Set callback for option selection
-   */
-  setOnOptionSelected(callback: (option: MenuOption) => void): void {
-    this.onOptionSelected = callback;
+  private handleSelectedMenuOption(): void {
+    this.currentSelectedMenuOption = this.availableMenuOptions[this.selectedMenuOptionIndex];
   }
 
-  /**
-   * Create menu UI
-   */
-  private createMenuUI(): void {
-    const centerX = this.scene.cameras.main.width / 2;
-    const centerY = this.scene.cameras.main.height / 2;
-
-    // Create container for menu
-    this.menuContainer = this.scene.add.container(centerX, centerY);
-    this.menuContainer.setScrollFactor(0);
-    this.menuContainer.setDepth(1000);
-
-    // Background
-    const bg = this.scene.add.rectangle(0, 0, 300, 300, 0x000000, 0.8);
-    bg.setOrigin(0.5);
-    this.menuContainer.add(bg);
-
-    // Title
-    const title = this.scene.add.text(0, -120, 'Menu', {
-      font: 'bold 24px Arial',
-      color: '#ffffff',
-    });
-    title.setOrigin(0.5);
-    this.menuContainer.add(title);
-
-    // Menu options
-    const optionStartY = -60;
-    const optionSpacing = 50;
-
-    this.menuOptions.forEach((option, index) => {
-      const yPos = optionStartY + index * optionSpacing;
-      const text = this.scene.add.text(0, yPos, option, {
-        font: '18px Arial',
-        color: '#ffffff',
-      });
-      text.setOrigin(0.5);
-      this.menuTexts.set(option, text);
-      this.menuContainer!.add(text);
-    });
-  }
-
-  /**
-   * Update menu display (highlight selected)
-   */
-  private updateMenuDisplay(): void {
-    this.menuTexts.forEach((text, option) => {
-      if (option === this.menuOptions[this.selectedIndex]) {
-        text.setColor('#ffff00');
-        text.setFontSize(20);
-      } else {
-        text.setColor('#ffffff');
-        text.setFontSize(18);
-      }
-    });
-  }
-
-  /**
-   * Cleanup
-   */
   destroy(): void {
-    if (this.menuContainer) {
-      this.menuContainer.destroy();
-    }
-    this.menuTexts.clear();
+    this.container.destroy();
   }
 }

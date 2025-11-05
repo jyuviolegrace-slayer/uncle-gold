@@ -1,95 +1,58 @@
-import { Scene, GameObjects } from 'phaser';
-import { Coordinate } from './GridUtils';
+import { Scene } from 'phaser';
 
-export interface ItemConfig {
-  id: string;
+export interface WorldItemConfig {
   scene: Scene;
-  x: number;
-  y: number;
+  position: { x: number; y: number };
   itemId: string;
-  itemName: string;
+  id: number;
+  name: string;
 }
 
-/**
- * World item - collectable items on the map
- */
-export class Item {
-  private id: string;
-  private itemId: string;
-  private itemName: string;
-  private sprite: GameObjects.Image;
-  private scene: Scene;
+export class WorldItem {
+  public scene: Scene;
+  public phaserGameObject: Phaser.GameObjects.Image;
+  public itemNum: number;
+  public itemKey: string;
+  public displayName: string;
 
-  constructor(config: ItemConfig) {
-    this.id = config.id;
-    this.itemId = config.itemId;
-    this.itemName = config.itemName;
+  constructor(config: WorldItemConfig) {
+    this.itemNum = config.id;
+    this.itemKey = config.itemId;
+    this.displayName = config.name;
     this.scene = config.scene;
-
-    // Create sprite for the item
-    this.sprite = this.scene.add.image(config.x, config.y, 'star');
-    this.sprite.setScale(0.75);
-    this.sprite.setTint(0xFFD700); // Gold tint for items
-    this.sprite.setData('itemId', this.itemId);
-    this.sprite.setData('type', 'item');
+    this.phaserGameObject = this.scene.add
+      .image(config.position.x, config.position.y, 'star')
+      .setOrigin(0);
   }
 
-  /**
-   * Get item ID
-   */
-  getId(): string {
-    return this.id;
+  get gameObject(): Phaser.GameObjects.Image {
+    return this.phaserGameObject;
   }
 
-  /**
-   * Get item type ID
-   */
-  getItemId(): string {
-    return this.itemId;
-  }
-
-  /**
-   * Get item name
-   */
-  getItemName(): string {
-    return this.itemName;
-  }
-
-  /**
-   * Get position
-   */
-  getPosition(): Coordinate {
+  get position(): { x: number; y: number } {
     return {
-      x: this.sprite.x,
-      y: this.sprite.y,
+      x: this.phaserGameObject.x,
+      y: this.phaserGameObject.y,
     };
   }
 
-  /**
-   * Get sprite
-   */
-  getSprite(): GameObjects.Image {
-    return this.sprite;
+  get itemId(): string {
+    return this.itemKey;
   }
 
-  /**
-   * Set visible
-   */
-  setVisible(visible: boolean): void {
-    this.sprite.setVisible(visible);
+  get id(): number {
+    return this.itemNum;
   }
 
-  /**
-   * Remove item from world
-   */
-  remove(): void {
-    this.sprite.destroy();
+  get name(): string {
+    return this.displayName;
   }
 
-  /**
-   * Get display name (can be customized per item type)
-   */
-  getDisplayName(): string {
-    return this.itemName;
+  update(time: number): void {
+    // Item update logic
+  }
+
+  destroy(): void {
+    this.phaserGameObject.destroy();
   }
 }
