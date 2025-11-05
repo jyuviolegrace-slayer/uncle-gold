@@ -60,6 +60,21 @@ export class MainMenu extends Scene
         }
     }
 
+    shutdown()
+    {
+        console.log('MainMenu scene shutting down');
+        if (this.logoTween) {
+            this.logoTween.stop();
+            this.logoTween = null;
+        }
+        this.input.keyboard?.off('keydown-ENTER');
+        this.input.keyboard?.off('keydown-ESC');
+        this.input.keyboard?.off('keydown-LEFT');
+        this.input.keyboard?.off('keydown-RIGHT');
+        this.input.keyboard?.off('keydown-z');
+        this.input.keyboard?.off('keydown-Z');
+    }
+
     private setupInput()
     {
         this.input.keyboard?.on('keydown-ENTER', () => {
@@ -69,8 +84,11 @@ export class MainMenu extends Scene
         this.input.keyboard?.on('keydown-ESC', () => {
             const gameStateManager = new GameStateManager();
             if (gameStateManager.hasSaveData()) {
+                console.log('Loading saved game...');
                 gameStateManager.loadGame();
                 SceneContext.initialize(gameStateManager);
+                console.log('Stopping MainMenu to load Overworld from save...');
+                this.scene.stop();
                 this.scene.start('Overworld', { mapId: gameStateManager.getPlayerState().currentArea });
             }
         });
@@ -211,6 +229,9 @@ export class MainMenu extends Scene
             console.log('Starting items added');
 
             console.log('Starting Overworld scene...');
+            console.log('Stopping MainMenu scene...');
+            this.scene.stop();
+            console.log('MainMenu stopped, now starting Overworld...');
             this.scene.start('Overworld', { mapId: 'starter-town' });
             console.log('Scene started successfully');
         } catch (error) {
