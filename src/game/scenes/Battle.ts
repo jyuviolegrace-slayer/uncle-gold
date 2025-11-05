@@ -1,7 +1,7 @@
 import { Scene, GameObjects, Physics, Input } from 'phaser';
 import { EventBus } from '../EventBus';
 import { SceneContext } from './SceneContext';
-import { BattleManager, Critter, MoveDatabase, CritterSpeciesDatabase, ICritter } from '../models';
+import { BattleManager, Critter, MoveDatabase, CritterSpeciesDatabase, ICritter, ItemDatabase } from '../models';
 import { AnimationManager } from '../managers/AnimationManager';
 
 interface BattleUIElements {
@@ -357,24 +357,213 @@ export class Battle extends Scene {
     this.battleState = 'selecting-party';
   }
 
-  private handleActionSelect(action: string) {
-    switch (action) {
-      case 'Fight':
-        this.createMoveMenu();
-        break;
-      case 'Bag':
-        this.ui.messageText?.setText('Item system not yet implemented');
-        break;
-      case 'Party':
-        this.createPartyMenu();
-        break;
-      case 'Flee':
-        this.attemptFlee();
-        break;
-      case 'Switch':
-        this.createPartyMenu();
-        break;
+  private createItemMenu() {
+    if (!this.ui.actionMenuContainer) return;
+    if (!this.battleManager) return;
+
+    const battle = this.battleManager.getBattle();
+    const isWildEncounter = battle.isWildEncounter;
+
+    if (!isWildEncounter) {
+      this.ui.messageText?.setText('Cannot use items against trainers!');
+      return;
     }
+
+    this.ui.actionMenuContainer.removeAll(true);
+
+    const inventory = this.gameStateManager.getPlayerState().inventory;
+    const items = Array.from(inventory.items.entries());
+
+    if (items.length === 0) {
+      this.ui.messageText?.setText('No items in bag!');
+      this.createMainActionMenu();
+      return;
+    }
+
+    items.slice(0, 6).forEach((entry, index) => {
+      const [itemId, quantity] = entry;
+      const item = ItemDatabase.getItem(itemId);
+      if (!item) return;
+
+      const x = (index % 2) * 200;
+      const y = Math.floor(index / 2) * 40;
+
+      const isSelected = index === this.selectedItemIndex;
+      const color = isSelected ? 0x6666ff : 0x4444ff;
+
+      const button = this.add.rectangle(x + 90, y + 20, 180, 35, color);
+      button.setInteractive();
+      button.on('pointerdown', () => this.handleItemSelect(itemId));
+      button.on('pointerover', () => button.setFillStyle(0x6666ff));
+      button.on('pointerout', () => button.setFillStyle(color));
+
+      const text = this.add.text(
+        x + 90,
+        y + 20,
+        `${item.name}\n×${quantity}`,
+        {
+          font: 'bold 12px Arial',
+          color: '#ffffff',
+          align: 'center',
+        }
+      );
+      text.setOrigin(0.5);
+
+      this.ui.actionMenuContainer?.add([button, text]);
+    });
+
+    const backButton = this.add.rectangle(90, (items.length > 3 ? 120 : 80) + 40, 180, 35, 0xff4444);
+    backButton.setInteractive();
+    backButton.on('pointerdown', () => this.createMainActionMenu());
+    backButton.on('pointerover', () => backButton.setFillStyle(0xff6666));
+    backButton.on('pointerout', () => backButton.setFillStyle(0xff4444));
+
+    const backText = this.add.text(90, (items.length > 3 ? 120 : 80) + 40, 'Back', {
+      font: 'bold 14px Arial',
+      color: '#ffffff',
+    });
+    backText.setOrigin(0.5);
+
+    this.ui.actionMenuContainer?.add([backButton, backText]);
+
+    this.battleState = 'selecting-item';
+  }
+
+  private handleItemSelect(itemId: string) {
+    this.selectedItemIndex = 0;
+    const item = ItemDatabase.getItem(itemId);
+
+    if (!item) return;
+
+    if (item.type === 'Pokeball') {
+      this.attemptCatch(itemId);
+    } else if (item.type === 'Potion') {
+      this.useHealingItem(itemId);
+    } else {
+      this.ui.messageText?.setText('Cannot use this item in battle!');
+    }
+  }
+
+  private async attemptCatch(orbId: string) {
+    if (!this.battleManager) return;
+
+    const item = ItemDatabase.getItem(orbId);
+    if (!item) return;
+
+    const battle = this.battleManager.getBattle();
+    const wildCritter = this.battleManager.getActiveCritter(battle.opponent.id);
+
+    if (!wildCritter) return;
+
+    this.ui.actionMenuContainer?.setVisible(false);
+    this.ui.messageText?.setText(`Throwing ${item.name}...`);
+
+    await this.waitMs(500);
+
+    const caught = this.battleManager.attemptCatch(wildCritter, item.catchModifier || 1.0);
+
+    if (caught) {
+      await this.animateCatchSuccess(wildCritter, item.name);
+      this.gameStateManager.removeItem(orbId, 1);
+      await this.handleCatchSuccess(wildCritter);
+    } else {
+      await this.animateCatchFailure();
+      this.gameStateManager.removeItem(orbId, 1);
+      this.ui.messageText?.setText("The critter broke free!");
+      await this.waitMs(1500);
+      this.createMainActionMenu();
+    }
+  }
+
+  private async animateCatchSuccess(wildCritter: ICritter, orbName: string) {
+    const stages = this.battleManager?.simulateCatchAnimation() || 4;
+
+    for (let i = 0; i < stages; i++) {
+      this.ui.messageText?.setText(`Caught ${wildCritter.nickname || 'Critter'}!`);
+      await this.waitMs(300);
+    }
+  }
+
+  private async animateCatchFailure() {
+    for (let i = 0; i < 3; i++) {
+      await this.waitMs(300);
+    }
+  }
+
+  private async handleCatchSuccess(wildCritter: ICritter) {
+    const party = this.gameStateManager.getParty();
+    const playerState = this.gameStateManager.getPlayerState();
+
+    if (party.length < playerState.party.maxSize) {
+      this.gameStateManager.addCritterToParty(wildCritter);
+      this.gameStateManager.addToPokedex(wildCritter.speciesId);
+      this.ui.messageText?.setText(`${wildCritter.nickname || 'Critter'} was added to the party!`);
+      await this.waitMs(2000);
+    } else {
+      this.ui.messageText?.setText(`Party full! ${wildCritter.nickname || 'Critter'} stored in PC.`);
+      EventBus.emit('pc:storage-needed', { critter: wildCritter });
+      await this.waitMs(2000);
+    }
+
+    this.endBattle('caught');
+  }
+
+  private async useHealingItem(itemId: string) {
+    const item = ItemDatabase.getItem(itemId);
+    if (!item || !item.effect) return;
+
+    const battle = this.battleManager?.getBattle();
+    if (!battle) return;
+
+    const playerCritter = this.battleManager?.getActiveCritter(battle.player.id);
+    if (!playerCritter) return;
+
+    this.ui.actionMenuContainer?.setVisible(false);
+
+    if (item.effect.type === 'heal') {
+      const healAmount = (item.effect.value as number) || 20;
+      const actualHeal = Math.min(
+        playerCritter.maxHP - playerCritter.currentHP,
+        healAmount
+      );
+      playerCritter.currentHP += actualHeal;
+      this.ui.messageText?.setText(`Used ${item.name}! Restored ${actualHeal} HP.`);
+    }
+
+    this.gameStateManager.removeItem(itemId, 1);
+    this.updateHPBars();
+
+    await this.waitMs(1000);
+    await this.executeOpponentTurn();
+
+    this.battleManager?.checkBattleStatus();
+
+    if (battle.battleStatus !== 'Active') {
+      this.endBattle();
+    } else {
+      this.ui.actionMenuContainer?.setVisible(true);
+      this.createMainActionMenu();
+    }
+  }
+
+  private handleActionSelect(action: string) {
+   switch (action) {
+     case 'Fight':
+       this.createMoveMenu();
+       break;
+     case 'Bag':
+       this.createItemMenu();
+       break;
+     case 'Party':
+       this.createPartyMenu();
+       break;
+     case 'Flee':
+       this.attemptFlee();
+       break;
+     case 'Switch':
+       this.createPartyMenu();
+       break;
+   }
   }
 
   private handleMoveSelect(moveIndex: number) {

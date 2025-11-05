@@ -1,6 +1,7 @@
 import { Scene, GameObjects } from 'phaser';
 import { EventBus } from '../EventBus';
 import { SceneContext } from './SceneContext';
+import { ItemDatabase } from '../models';
 
 /**
  * Shop Scene - Item trading and purchasing
@@ -56,12 +57,7 @@ export class Shop extends Scene {
 
     this.shopItemsContainer.removeAll(true);
 
-    const shopItems = [
-      { id: 'pokeball', name: 'Pokéball', price: 200 },
-      { id: 'potion', name: 'Potion', price: 300 },
-      { id: 'super-potion', name: 'Super Potion', price: 700 },
-      { id: 'revive', name: 'Revive', price: 1500 },
-    ];
+    const shopItems = ItemDatabase.getShopItems();
 
     shopItems.forEach((item, index) => {
       const y = index * 60;
@@ -74,7 +70,7 @@ export class Shop extends Scene {
         color: '#ffffff',
       });
 
-      const priceText = this.add.text(10, y + 25, `Price: $${item.price}`, {
+      const priceText = this.add.text(10, y + 25, `Price: ${item.price}`, {
         font: '12px Arial',
         color: '#ffff00',
       });
@@ -90,7 +86,8 @@ export class Shop extends Scene {
     });
 
     this.input.keyboard?.on('keydown-DOWN_ARROW', () => {
-      this.selectedItemIndex = Math.min(3, this.selectedItemIndex + 1);
+      const maxIndex = ItemDatabase.getShopItems().length - 1;
+      this.selectedItemIndex = Math.min(maxIndex, this.selectedItemIndex + 1);
       this.renderShopItems();
     });
 
@@ -112,17 +109,20 @@ export class Shop extends Scene {
   }
 
   private purchaseItem() {
-    const items = ['pokeball', 'potion', 'super-potion', 'revive'];
-    const prices = [200, 300, 700, 1500];
+    const shopItems = ItemDatabase.getShopItems();
+    const selectedItem = shopItems[this.selectedItemIndex];
 
-    const itemId = items[this.selectedItemIndex];
-    const price = prices[this.selectedItemIndex];
+    if (!selectedItem || !selectedItem.price) {
+      this.infoText?.setText('Cannot purchase this item!');
+      return;
+    }
+
     const playerState = this.gameStateManager.getPlayerState();
 
-    if (playerState.money >= price) {
-      this.gameStateManager.spendMoney(price);
-      this.gameStateManager.addItem(itemId, 1);
-      this.infoText?.setText(`Purchased ${itemId}!`);
+    if (playerState.money >= selectedItem.price) {
+      this.gameStateManager.spendMoney(selectedItem.price);
+      this.gameStateManager.addItem(selectedItem.id, 1);
+      this.infoText?.setText(`Purchased ${selectedItem.name}!`);
     } else {
       this.infoText?.setText('Not enough money!');
     }

@@ -132,6 +132,10 @@ export class MainMenu extends Scene
         gameStateManager.addCritterToParty(starterCritter);
         gameStateManager.addMoney(1000);
 
+        // Add starting items
+        gameStateManager.addItem('pokeball', 5);
+        gameStateManager.addItem('potion', 3);
+
         this.scene.start('Overworld', { entryPoint: 'starter-town' });
     }
     
