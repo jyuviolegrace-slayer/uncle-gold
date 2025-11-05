@@ -1,0 +1,166 @@
+.mobileControlsContainer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: none;
+    padding: 12px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 50%);
+    z-index: 999;
+    pointer-events: auto;
+}
+
+@media (max-width: 768px) {
+    .mobileControlsContainer {
+        display: flex;
+        gap: 16px;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+}
+
+.dpadContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+}
+
+.dpadRow {
+    display: flex;
+    gap: 4px;
+}
+
+.dpadButton {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, rgba(14, 195, 201, 0.4) 0%, rgba(14, 195, 201, 0.2) 100%);
+    border: 2px solid #0ec3c9;
+    border-radius: 4px;
+    color: #0ec3c9;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+    transition: all 0.1s;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+.dpadButton:active {
+    background: linear-gradient(135deg, rgba(14, 195, 201, 0.8) 0%, rgba(14, 195, 201, 0.6) 100%);
+    box-shadow: 0 0 12px rgba(14, 195, 201, 0.6);
+}
+
+.dpadButtonUp::before {
+    content: '▲';
+    font-size: 20px;
+}
+
+.dpadButtonDown::before {
+    content: '▼';
+    font-size: 20px;
+}
+
+.dpadButtonLeft::before {
+    content: '◄';
+    font-size: 20px;
+}
+
+.dpadButtonRight::before {
+    content: '►';
+    font-size: 20px;
+}
+
+.actionButtonsContainer {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: 150px;
+}
+
+.actionButton {
+    flex: 1;
+    min-width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, rgba(70, 105, 225, 0.4) 0%, rgba(70, 105, 225, 0.2) 100%);
+    border: 2px solid #4169e1;
+    border-radius: 4px;
+    color: #4169e1;
+    font-weight: bold;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+    transition: all 0.1s;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+.actionButton:active {
+    background: linear-gradient(135deg, rgba(70, 105, 225, 0.8) 0%, rgba(70, 105, 225, 0.6) 100%);
+    box-shadow: 0 0 12px rgba(70, 105, 225, 0.6);
+}
+
+.interactButton {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.4) 0%, rgba(255, 215, 0, 0.2) 100%);
+    border-color: #ffd700;
+    color: #ffd700;
+}
+
+.interactButton:active {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.8) 0%, rgba(255, 215, 0, 0.6) 100%);
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+}
+
+.pauseButton {
+    background: linear-gradient(135deg, rgba(255, 20, 147, 0.4) 0%, rgba(255, 20, 147, 0.2) 100%);
+    border-color: #ff1493;
+    color: #ff1493;
+}
+
+.pauseButton:active {
+    background: linear-gradient(135deg, rgba(255, 20, 147, 0.8) 0%, rgba(255, 20, 147, 0.6) 100%);
+    box-shadow: 0 0 12px rgba(255, 20, 147, 0.6);
+}
+
+/* Landscape mode - compact layout */
+@media (max-height: 500px) and (orientation: landscape) {
+    .mobileControlsContainer {
+        bottom: 8px;
+        padding: 8px;
+        gap: 12px;
+    }
+
+    .dpadButton {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+
+    .dpadButton:before {
+        font-size: 16px;
+    }
+
+    .actionButton {
+        min-width: 36px;
+        height: 36px;
+        font-size: 10px;
+    }
+}
+
+/* iPhone notch support */
+@supports (padding: max(0px)) {
+    .mobileControlsContainer {
+        padding-left: max(12px, env(safe-area-inset-left));
+        padding-right: max(12px, env(safe-area-inset-right));
+    }
+}
