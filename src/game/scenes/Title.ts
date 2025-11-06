@@ -5,6 +5,7 @@ import { Direction } from '../models/common';
 import { DataManagerStoreKeys, dataManager } from '../services/DataManager';
 import { NineSlice } from '../utils/NineSlice';
 import { OptionMenuOptions } from '../models/Options';
+import { saveService, SaveSlot } from '../services/SaveService';
 
 const MENU_TEXT_STYLE: Phaser.Types.GameObjects.Text.TextStyle = Object.freeze({
   fontFamily: FontKeys.KENNEY_FUTURE_NARROW,
@@ -46,7 +47,7 @@ export class Title extends BaseScene {
     super.create();
 
     this.selectedMenuOption = MainMenuOptions.NEW_GAME;
-    this.isContinueButtonEnabled = dataManager.dataStore.get(DataManagerStoreKeys.GAME_STARTED) || false;
+    this.isContinueButtonEnabled = saveService.hasAnySaveData();
 
     this.createTitleBackground();
     this.createMenu();
@@ -134,6 +135,15 @@ export class Title extends BaseScene {
 
       if (this.selectedMenuOption === MainMenuOptions.NEW_GAME) {
         dataManager.startNewGame();
+        saveService.setActiveSlot(SaveSlot.SLOT_1);
+      } else if (this.selectedMenuOption === MainMenuOptions.CONTINUE) {
+        const mostRecentSlot = saveService.getMostRecentSlot();
+        if (mostRecentSlot) {
+          saveService.loadGame(mostRecentSlot);
+        } else {
+          console.error('[Title:setupTransitions] No save data found for Continue option');
+          return;
+        }
       }
 
       // Get starting area from DataManager

@@ -21,3 +21,7 @@ export type {
 } from './DataManager';
 
 export { AudioManager } from './AudioManager';
+
+export { SaveService, saveService } from './SaveService';
+export { SaveSlot } from './SaveService';
+export type { SaveSchema } from './SaveService';
