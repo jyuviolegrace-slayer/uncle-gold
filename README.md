@@ -57,6 +57,11 @@ npm run build-nolog
 | `npm run dev-nolog` | Launch development server without analytics |
 | `npm run build` | Create production build with analytics |
 | `npm run build-nolog` | Create production build without analytics |
+| `npm run lint` | Run ESLint code quality checks |
+| `npm test` | Run Jest test suite |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run test:coverage` | Generate test coverage report |
+| `npx tsc --noEmit` | Run TypeScript type checking |
 
 ## 🎯 Game Controls
 
@@ -172,6 +177,36 @@ npm run build-nolog
 3. Update `src/game/main.ts` for new scenes
 4. Add asset keys to `src/game/assets/AssetKeys.ts`
 5. Test scene transitions thoroughly
+
+## 🧪 Testing
+
+The project uses Jest with ts-jest for comprehensive testing coverage:
+
+### Running Tests
+```bash
+# Run all tests
+npm test
+
+# Watch mode for development
+npm run test:watch
+
+# Generate coverage report
+npm run test:coverage
+
+# Type checking
+npx tsc --noEmit
+
+# Code linting
+npm run lint
+```
+
+### Test Coverage
+- **150+ Tests** covering core game systems
+- **Smoke Tests**: Scene initialization and loading
+- **Unit Tests**: Data management, save/load, input handling
+- **Integration Tests**: Battle flow, encounter system, menu navigation
+
+For detailed testing documentation, see [docs/testing.md](docs/testing.md).
 
 ## 🔧 Configuration
 
