@@ -16,3 +16,7 @@ export type { HealthBarConfig } from './HealthBar';
 
 export { ExpBar } from './ExpBar';
 export type { ExpBarConfig } from './ExpBar';
+
+// Menu framework
+export { Menu, ConfirmationMenu, WorldMenu, CONFIRMATION_MENU_OPTIONS, MENU_OPTIONS, MENU_COLOR } from './menu';
+export type { ConfirmationMenuOption, WorldMenuOption, MenuColorScheme } from './menu';

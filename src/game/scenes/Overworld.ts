@@ -9,6 +9,7 @@ import { TILE_SIZE } from '../world/constants';
 import { dataLoader } from '../data/DataLoader';
 import { weightedRandom } from '../utils/weightedRandom';
 import { getTargetPositionFromGameObjectPositionAndDirection } from '../world/utils/gridUtils';
+import { WorldMenu } from '../ui/menu';
 
 export interface OverworldSceneData {
   isPlayerKnockedOut?: boolean;
@@ -39,6 +40,7 @@ export class Overworld extends BaseScene {
   private rectangleForOverlapCheck2: Phaser.Geom.Rectangle;
   private rectangleOverlapResult: Phaser.Geom.Rectangle;
   private debugEnabled: boolean = false;
+  private worldMenu: WorldMenu | undefined;
 
   constructor() {
     super(SceneKeys.WORLD);
@@ -170,6 +172,12 @@ export class Overworld extends BaseScene {
     const dataManager = this.registry.get('dataManager') as DataManager;
     dataManager.dataStore.set(DataManagerStoreKeys.GAME_STARTED, true);
 
+    // Initialize world menu
+    this.worldMenu = new WorldMenu(this, dataManager);
+
+    // Setup menu event listeners
+    this.setupMenuEventListeners();
+
     // Start background music
     this.audioManager.playBackgroundMusic('MAIN');
 
@@ -180,12 +188,36 @@ export class Overworld extends BaseScene {
   update(time: number, delta: number): void {
     super.update(time, delta);
 
+    // Handle menu input first (takes priority over other input)
+    if (this.worldMenu && this.worldMenu.isOpen) {
+      const inputState = this.inputManager.getInputState();
+      
+      if (inputState.menuPressed) {
+        this.worldMenu.hide();
+        this.unlockInput();
+      } else if (inputState.cancelPressed) {
+        this.worldMenu.hide();
+        this.unlockInput();
+      } else if (inputState.confirmPressed) {
+        this.worldMenu.handlePlayerInput('OK');
+      } else if (inputState.directionPressed !== Direction.NONE) {
+        this.worldMenu.handlePlayerInput(inputState.directionPressed);
+      }
+      return;
+    }
+
     if (!this.player || this.isInputLocked()) {
       return;
     }
 
     // Get input from InputManager
     const inputState = this.inputManager.getInputState();
+    
+    // Handle menu opening
+    if (inputState.menuPressed) {
+      this.openWorldMenu();
+      return;
+    }
     
     // Handle movement
     if (inputState.directionDown !== Direction.NONE) {
@@ -957,10 +989,106 @@ export class Overworld extends BaseScene {
   }
 
   /**
+   * Opens the world menu and locks input
+   */
+  private openWorldMenu(): void {
+    if (!this.worldMenu) {
+      return;
+    }
+
+    this.lockInput();
+    this.worldMenu.show();
+    
+    // Play menu open sound
+    this.audioManager.playSoundFx('SELECT');
+  }
+
+  /**
+   * Setup event listeners for menu functionality
+   */
+  private setupMenuEventListeners(): void {
+    // Listen for menu open/close events from React HUD
+    EventBus.on('hud:menu-toggle', this.handleMenuToggle, this);
+
+    // Listen for scene launch events from menu
+    EventBus.on('scene:launch', this.handleSceneLaunch, this);
+
+    // Listen for options changes to update menu theme
+    EventBus.on('options:changed', this.handleOptionsChanged, this);
+
+    // Listen for save requests
+    EventBus.on('save:requested', this.handleSaveRequest, this);
+  }
+
+  /**
+   * Handle menu toggle events from React HUD
+   */
+  private handleMenuToggle(): void {
+    if (this.worldMenu?.isOpen) {
+      this.worldMenu.hide();
+      this.unlockInput();
+    } else {
+      this.openWorldMenu();
+    }
+  }
+
+  /**
+   * Handle scene launch events from menu
+   */
+  private handleSceneLaunch(data: { sceneKey: string }): void {
+    // Close menu before launching scene
+    if (this.worldMenu?.isOpen) {
+      this.worldMenu.hide();
+    }
+    
+    // Launch the requested scene
+    this.launchOverlay(data.sceneKey);
+  }
+
+  /**
+   * Handle options change events
+   */
+  private handleOptionsChanged(): void {
+    if (this.worldMenu) {
+      this.worldMenu.updateTheme();
+    }
+  }
+
+  /**
+   * Handle save requests
+   */
+  private handleSaveRequest(): void {
+    const dataManager = this.registry.get('dataManager') as DataManager;
+    dataManager.saveData();
+    
+    // Emit save notification
+    EventBus.emit('hud:notification', {
+      message: 'Game saved!',
+      type: 'save'
+    });
+    
+    // Close menu after save
+    if (this.worldMenu?.isOpen) {
+      this.worldMenu.hide();
+      this.unlockInput();
+    }
+  }
+
+  /**
    * Clean up event listeners
    */
   shutdown(): void {
     EventBus.off('battle:start', this.handleBattleStart, this);
+    EventBus.off('hud:menu-toggle', this.handleMenuToggle, this);
+    EventBus.off('scene:launch', this.handleSceneLaunch, this);
+    EventBus.off('options:changed', this.handleOptionsChanged, this);
+    EventBus.off('save:requested', this.handleSaveRequest, this);
+    
+    // Clean up menu
+    if (this.worldMenu) {
+      this.worldMenu.destroy();
+    }
+    
     super.shutdown();
   }
 }
