@@ -8,4 +8,7 @@ export { Options } from './Options';
 export { Overworld } from './Overworld';
 export { Battle } from './Battle';
 export { GameOver } from './GameOver';
+export { InventoryScene } from './Inventory';
+export { MonsterPartyScene } from './MonsterParty';
+export { MonsterDetailsScene } from './MonsterDetails';
 export { BaseScene } from './common/BaseScene';
