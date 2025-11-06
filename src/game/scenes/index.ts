@@ -13,4 +13,5 @@ export { MonsterPartyScene } from './MonsterParty';
 export { MonsterDetailsScene } from './MonsterDetails';
 export { Dialog } from './Dialog';
 export { Cutscene, type CutsceneAction } from './Cutscene';
+export { ShopScene } from './Shop';
 export { BaseScene } from './common/BaseScene';

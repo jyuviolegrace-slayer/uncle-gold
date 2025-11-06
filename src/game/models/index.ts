@@ -8,3 +8,4 @@ export * from './events';
 export * from './map';
 export * from './type';
 export * from './types';
+export * from './shop';

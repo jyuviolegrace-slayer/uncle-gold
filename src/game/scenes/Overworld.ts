@@ -959,6 +959,15 @@ export class Overworld extends BaseScene {
         this.isProcessingNpcEvent = false;
         this.handleNpcInteraction();
         break;
+      case NpcEventType.SHOP:
+        console.log('[Overworld:handleNpcInteraction] SHOP event:', (eventToHandle as any).data.shopId);
+        this.launchShopScene((eventToHandle as any).data.shopId);
+        // Listen for shop completion
+        EventBus.once('shop:closed', () => {
+          this.isProcessingNpcEvent = false;
+          this.handleNpcInteraction();
+        });
+        break;
       default:
         console.warn(`[Overworld:handleNpcInteraction] Unknown NPC event type: ${eventType}`);
         this.isProcessingNpcEvent = false;
@@ -1151,6 +1160,16 @@ export class Overworld extends BaseScene {
       this.scene.resume(SceneKeys.WORLD);
       this.scene.stop(SceneKeys.CUTSCENE);
     });
+  }
+
+  /**
+   * Launch the shop scene
+   * @param shopId The ID of the shop to launch
+   */
+  private launchShopScene(shopId: string): void {
+    this.lockInput();
+    this.scene.launch(SceneKeys.SHOP, { shopId });
+    this.scene.pause(SceneKeys.WORLD);
   }
 
   /**

@@ -49,6 +49,7 @@ export enum NpcEventType {
   TRADE = 'TRADE',
   ITEM = 'ITEM',
   BATTLE = 'BATTLE',
+  SHOP = 'SHOP',
 }
 
 export enum GameEventType {
