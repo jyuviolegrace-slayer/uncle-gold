@@ -1,5 +1,7 @@
 import { Scene } from 'phaser';
 import { EventBus } from '../../EventBus';
+import { AudioManager } from '../../services/AudioManager';
+import { InputManager } from '../../managers/InputManager';
 
 /**
  * BaseScene - Abstract base class for all game scenes
@@ -15,6 +17,8 @@ import { EventBus } from '../../EventBus';
 export abstract class BaseScene extends Scene {
   protected inputLocked: boolean = false;
   protected eventBus: typeof EventBus;
+  protected audioManager: AudioManager;
+  protected inputManager: InputManager;
 
   constructor(key: string) {
     super(key);
@@ -35,6 +39,10 @@ export abstract class BaseScene extends Scene {
 
   create(): void {
     this.log(`[${this.constructor.name}:create] invoked`);
+    
+    // Initialize shared managers
+    this.audioManager = new AudioManager(this);
+    this.inputManager = new InputManager(this);
     
     // Setup event listeners for scene lifecycle
     this.events.on('resume', this.handleSceneResume, this);
@@ -63,6 +71,9 @@ export abstract class BaseScene extends Scene {
    */
   lockInput(): void {
     this.inputLocked = true;
+    if (this.inputManager) {
+      this.inputManager.lockInput();
+    }
   }
 
   /**
@@ -70,13 +81,16 @@ export abstract class BaseScene extends Scene {
    */
   unlockInput(): void {
     this.inputLocked = false;
+    if (this.inputManager) {
+      this.inputManager.unlockInput();
+    }
   }
 
   /**
    * Check if input is currently locked
    */
   isInputLocked(): boolean {
-    return this.inputLocked;
+    return this.inputLocked || (this.inputManager?.isInputLocked ?? false);
   }
 
   /**
@@ -92,6 +106,15 @@ export abstract class BaseScene extends Scene {
    */
   protected handleSceneCleanup(): void {
     this.log(`[${this.constructor.name}:handleSceneCleanup] invoked`);
+    
+    // Cleanup managers
+    if (this.audioManager) {
+      this.audioManager.destroy();
+    }
+    if (this.inputManager) {
+      this.inputManager.destroy();
+    }
+    
     this.events.off('resume', this.handleSceneResume, this);
   }
 
