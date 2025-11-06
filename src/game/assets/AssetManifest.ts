@@ -156,6 +156,7 @@ export const dataAssets: DataAssetDescriptor[] = [
   { key: CoreDataKeys.MOVES_SCHEMA, url: `${DATA_BASE_PATH}/moves.schema.json` },
   { key: CoreDataKeys.TYPES, url: `${DATA_BASE_PATH}/types.json` },
   { key: CoreDataKeys.TYPES_SCHEMA, url: `${DATA_BASE_PATH}/types.schema.json` },
+  { key: CoreDataKeys.SHOPS, url: `${DATA_BASE_PATH}/shops.json` },
   { key: CoreDataKeys.LEGACY_CRITTER_INDEX, url: `${DATA_BASE_PATH}/legacy-critters.json` },
   { key: CoreDataKeys.LEGACY_ENCOUNTER_INDEX, url: `${DATA_BASE_PATH}/legacy-encounters.json` },
   { key: CoreDataKeys.LEGACY_EVENT_INDEX, url: `${DATA_BASE_PATH}/legacy-events.json` },

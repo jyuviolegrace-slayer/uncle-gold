@@ -24,7 +24,15 @@ export interface NpcEventHeal {
   data: Record<string, never>;
 }
 
-export type NpcEvent = NpcEventMessage | NpcEventSceneFadeInAndOut | NpcEventHeal;
+export interface NpcEventShop {
+  type: NpcEventType.SHOP;
+  requires: string[];
+  data: {
+    shopId: string;
+  };
+}
+
+export type NpcEvent = NpcEventMessage | NpcEventSceneFadeInAndOut | NpcEventHeal | NpcEventShop;
 
 export interface NpcDetails {
   frame: number;

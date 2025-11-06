@@ -1,0 +1,33 @@
+[
+  {
+    "id": "central-plaza-shop",
+    "name": "Poké Mart",
+    "items": [
+      { "itemId": "pokeball", "price": 200, "quantity": 999 },
+      { "itemId": "great-ball", "price": 600, "quantity": 999 },
+      { "itemId": "potion", "price": 300, "quantity": 999 },
+      { "itemId": "super-potion", "price": 700, "quantity": 999 },
+      { "itemId": "antidote", "price": 100, "quantity": 999 },
+      { "itemId": "awakening", "price": 200, "quantity": 999 }
+    ]
+  },
+  {
+    "id": "starter-town-shop",
+    "name": "General Store",
+    "items": [
+      { "itemId": "pokeball", "price": 200, "quantity": 999 },
+      { "itemId": "potion", "price": 300, "quantity": 999 },
+      { "itemId": "antidote", "price": 100, "quantity": 999 }
+    ]
+  },
+  {
+    "id": "mountain-pass-shop",
+    "name": "Mountain Lodge Shop",
+    "items": [
+      { "itemId": "great-ball", "price": 600, "quantity": 999 },
+      { "itemId": "ultra-ball", "price": 1000, "quantity": 999 },
+      { "itemId": "super-potion", "price": 700, "quantity": 999 },
+      { "itemId": "hyper-potion", "price": 1200, "quantity": 999 }
+    ]
+  }
+]

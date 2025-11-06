@@ -23,6 +23,7 @@ import type {
 } from '../models';
 import { MoveCategory, ItemCategory, ItemEffect } from '../models';
 import { EventDetails, SignDetails, NpcDetails } from '../models';
+import { Shop } from '../models/shop';
 
 export class DataLoader {
   private critters: Map<string, Critter> = new Map();
@@ -36,6 +37,7 @@ export class DataLoader {
   private events: Record<string, EventDetails> = {};
   private signs: Record<string, SignDetails> = {};
   private npcs: Record<string, NpcDetails> = {};
+  private shops: Map<string, Shop> = new Map();
 
   private isInitialized = false;
   private initPromise?: Promise<void>;
@@ -65,6 +67,7 @@ export class DataLoader {
       this.loadEvents(jsonCache);
       this.loadSigns(jsonCache);
       this.loadNpcs(jsonCache);
+      this.loadShops(jsonCache);
       this.loadLegacyData(jsonCache);
 
       this.isInitialized = true;
@@ -172,6 +175,19 @@ export class DataLoader {
     }
 
     this.npcs = rawData as Record<string, NpcDetails>;
+  }
+
+  private loadShops(cache: Phaser.Cache.BaseCache): void {
+    const rawData = cache.get('SHOPS');
+    if (!rawData) {
+      console.warn('Missing shop data: SHOPS');
+      return;
+    }
+
+    const shopsArray = rawData as Shop[];
+    shopsArray.forEach((shop) => {
+      this.shops.set(shop.id, shop);
+    });
   }
 
   private loadLegacyData(cache: Phaser.Cache.BaseCache): void {
@@ -338,6 +354,10 @@ export class DataLoader {
 
   getNpcData(npcId: number): NpcDetails | undefined {
     return this.npcs[npcId.toString()];
+  }
+
+  getShopById(shopId: string): Shop | undefined {
+    return this.shops.get(shopId);
   }
 }
 
