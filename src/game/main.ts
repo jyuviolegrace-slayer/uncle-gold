@@ -1,4 +1,5 @@
-import { Boot } from "./scenes/Boot";
+import { Boot, Preloader, Title, Overworld, Battle, Options } from "./scenes";
+import { SceneKeys } from "./assets";
 import { AUTO, Game } from "phaser";
 
 //  Find out more information about the Game Config at:
@@ -16,7 +17,20 @@ const config: Phaser.Types.Core.GameConfig = {
             gravity: { y: 0 },
         },
     },
-    scene: [Boot],
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: 1024,
+        height: 768
+    },
+    scene: [
+        Boot,
+        Preloader,
+        Title,
+        Overworld,
+        Battle,
+        Options
+    ],
 };
 
 const StartGame = (parent: string) => {
