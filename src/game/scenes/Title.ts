@@ -136,7 +136,12 @@ export class Title extends BaseScene {
         dataManager.startNewGame();
       }
 
-      this.transitionToScene(SceneKeys.WORLD);
+      // Get starting area from DataManager
+      const playerLocation = dataManager.dataStore.get(DataManagerStoreKeys.PLAYER_LOCATION);
+      this.transitionToScene(SceneKeys.WORLD, {
+        area: playerLocation.area,
+        isInterior: playerLocation.isInterior,
+      });
     });
   }
 
