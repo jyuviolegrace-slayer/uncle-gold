@@ -1,7 +1,7 @@
 import { Data } from "phaser";
 import { EventBus } from "../EventBus";
 import { Direction, GameFlag } from "../models/common";
-import { InventoryItem, LegacyInventoryItem } from "../models/item";
+import { InventoryItem, LegacyInventoryItem, LegacyItem } from "../models/item";
 import { CritterInstance } from "../models/critter";
 import { dataLoader } from "../data/DataLoader";
 
@@ -267,6 +267,28 @@ export class DataManager extends Phaser.Events.EventEmitter {
             inventory.push({
                 item: {
                     id: parseInt(item.id, 10),
+                },
+                quantity,
+            });
+        }
+        this.store.set(DataManagerStoreKeys.INVENTORY, inventory);
+        this.eventBus.emit("inventory:updated", inventory);
+    }
+
+    addLegacyItem(item: LegacyItem, quantity: number): void {
+        const inventory = this.store.get(
+            DataManagerStoreKeys.INVENTORY
+        ) as LegacyInventoryItem[];
+        const existingItem = inventory.find((inventoryItem) => {
+            return inventoryItem.item.id === item.id;
+        });
+
+        if (existingItem) {
+            existingItem.quantity += quantity;
+        } else {
+            inventory.push({
+                item: {
+                    id: item.id,
                 },
                 quantity,
             });

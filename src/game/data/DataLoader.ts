@@ -22,6 +22,7 @@ import type {
   EncounterTable,
 } from '../models';
 import { MoveCategory, ItemCategory, ItemEffect } from '../models';
+import { EventDetails, SignDetails, NpcDetails } from '../models';
 
 export class DataLoader {
   private critters: Map<string, Critter> = new Map();
@@ -32,6 +33,9 @@ export class DataLoader {
   private legacyAttacks: Map<number, LegacyAttack> = new Map();
   private legacyItems: Map<number, LegacyItem> = new Map();
   private legacyMonsters: Map<number, LegacyMonster> = new Map();
+  private events: Record<string, EventDetails> = {};
+  private signs: Record<string, SignDetails> = {};
+  private npcs: Record<string, NpcDetails> = {};
 
   private isInitialized = false;
   private initPromise?: Promise<void>;
@@ -58,6 +62,9 @@ export class DataLoader {
       this.loadItems(jsonCache);
       this.loadTypes(jsonCache);
       this.loadEncounters(jsonCache);
+      this.loadEvents(jsonCache);
+      this.loadSigns(jsonCache);
+      this.loadNpcs(jsonCache);
       this.loadLegacyData(jsonCache);
 
       this.isInitialized = true;
@@ -135,6 +142,36 @@ export class DataLoader {
     }
 
     this.encounters = EncounterDataSchema.parse(rawData);
+  }
+
+  private loadEvents(cache: Phaser.Cache.BaseCache): void {
+    const rawData = cache.get('EVENTS');
+    if (!rawData) {
+      console.warn('Missing event data: EVENTS');
+      return;
+    }
+
+    this.events = rawData as Record<string, EventDetails>;
+  }
+
+  private loadSigns(cache: Phaser.Cache.BaseCache): void {
+    const rawData = cache.get('SIGNS');
+    if (!rawData) {
+      console.warn('Missing sign data: SIGNS');
+      return;
+    }
+
+    this.signs = rawData as Record<string, SignDetails>;
+  }
+
+  private loadNpcs(cache: Phaser.Cache.BaseCache): void {
+    const rawData = cache.get('NPCS');
+    if (!rawData) {
+      console.warn('Missing NPC data: NPCS');
+      return;
+    }
+
+    this.npcs = rawData as Record<string, NpcDetails>;
   }
 
   private loadLegacyData(cache: Phaser.Cache.BaseCache): void {
@@ -289,6 +326,18 @@ export class DataLoader {
     }
 
     return type.effectiveness[defendingType] ?? 1.0;
+  }
+
+  getEventData(eventId: string): EventDetails | undefined {
+    return this.events[eventId];
+  }
+
+  getSignData(signId: string): SignDetails | undefined {
+    return this.signs[signId.toString()];
+  }
+
+  getNpcData(npcId: number): NpcDetails | undefined {
+    return this.npcs[npcId.toString()];
   }
 }
 
