@@ -53,10 +53,10 @@ describe('DataManager', () => {
       const inventory = testManager.getInventory();
       
       expect(inventory).toHaveLength(2);
-      expect(inventory[0].item.id).toBe('10');
-      expect(inventory[0].quantity).toBe(2);
-      expect(inventory[1].item.id).toBe('20');
-      expect(inventory[1].quantity).toBe(1);
+      expect(inventory[0]!.item.id).toBe('10');
+      expect(inventory[0]!.quantity).toBe(2);
+      expect(inventory[1]!.item.id).toBe('20');
+      expect(inventory[1]!.quantity).toBe(1);
     });
   });
 

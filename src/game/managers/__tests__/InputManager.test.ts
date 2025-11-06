@@ -31,16 +31,14 @@ class MockScene {
 
     // Mock JustDown function
     Object.keys(mockCursorKeys).forEach(key => {
-      mockCursorKeys[key].isDown = false;
+      (mockCursorKeys as any)[key].isDown = false;
     });
 
-    // Mock Phaser.Input.Keyboard.JustDown
-    jest.mock('phaser', () => ({
+    // Mock Phaser
+    const mockPhaser = {
       Input: {
         Keyboard: {
-          JustDown: jest.fn((key) => {
-            return (key as any).mockJustDown || false;
-          }),
+          JustDown: jest.fn(() => false),
         },
         KeyCodes: {
           ENTER: 'ENTER',
@@ -49,10 +47,12 @@ class MockScene {
           F: 'F',
         },
       },
-    }));
+    };
+    
+    jest.mock('phaser', () => mockPhaser);
 
-    this.input.keyboard.createCursorKeys.mockReturnValue(mockCursorKeys);
-    this.input.keyboard.addKey.mockReturnValue({ mockJustDown: false });
+    (this.input.keyboard as any).createCursorKeys.mockReturnValue(mockCursorKeys);
+    (this.input.keyboard as any).addKey.mockReturnValue({ mockJustDown: false });
   }
 }
 
@@ -86,10 +86,10 @@ describe('InputManager', () => {
     });
 
     test('should set input lock via property', () => {
-      inputManager.lockInput = true;
+      inputManager.lockInput();
       expect(inputManager.isInputLocked).toBe(true);
       
-      inputManager.lockInput = false;
+      inputManager.unlockInput();
       expect(inputManager.isInputLocked).toBe(false);
     });
   });

@@ -105,29 +105,43 @@ export class DataUtils {
   /**
    * Get encounter area details for a specific area
    */
-  static getEncounterAreaDetails(areaId: string): EncounterData | undefined {
-    return dataLoader.getEncounter(areaId);
+  static getEncounterAreaDetails(areaId: string): number[][] | undefined {
+    const table = dataLoader.getEncounterTable(areaId);
+    if (table && !table.areaId) {
+      // Convert EncounterEntry[] to number[][] to match expected return type
+      return table.encounters.map(entry => [entry.monsterId, entry.weight]);
+    }
+    return undefined;
   }
 
   /**
    * Get NPC data by ID
    */
   static getNpcData(npcId: string): NpcDetails | undefined {
-    return dataLoader.getNpcById(npcId);
+    // NPC data not yet implemented in DataLoader
+    console.warn('[DataUtils] getNpcData not yet implemented');
+    return undefined;
+    // return dataLoader.getNpcById(npcId);
   }
 
   /**
    * Get event data by ID
    */
   static getEventData(eventId: string): EventDetails | undefined {
-    return dataLoader.getEventById(eventId);
+    // Event data not yet implemented in DataLoader
+    console.warn('[DataUtils] getEventData not yet implemented');
+    return undefined;
+    // return dataLoader.getEventById(eventId);
   }
 
   /**
    * Get all events
    */
   static getAllEvents(): EventDetails[] {
-    return dataLoader.getAllEvents();
+    // Event data not yet implemented in DataLoader
+    console.warn('[DataUtils] getAllEvents not yet implemented');
+    return [];
+    // return dataLoader.getAllEvents();
   }
 
   /**
