@@ -518,6 +518,17 @@ export class DataManager extends Phaser.Events.EventEmitter {
             money: (this.store.get(DataManagerStoreKeys.MONEY) as number) || 0,
         };
     }
+
+    getCurrentState(): GlobalState {
+        return this.dataManagerDataToGlobalStateObject();
+    }
+
+    loadFromState(state: GlobalState): void {
+        this.updateDataManager(state);
+        this.eventBus.emit("money:updated", state.money);
+        this.eventBus.emit("party:updated", state.monsters.inParty);
+        this.eventBus.emit("inventory:updated", state.inventory);
+    }
 }
 
 export const dataManager = new DataManager();

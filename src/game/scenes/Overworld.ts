@@ -12,6 +12,7 @@ import { getTargetPositionFromGameObjectPositionAndDirection } from '../world/ut
 import { WorldMenu } from '../ui/menu';
 import { Dialog, DialogSceneData } from './Dialog';
 import { Cutscene, CutsceneSceneData, CutsceneAction } from './Cutscene';
+import { saveService } from '../services/SaveService';
 
 export interface OverworldSceneData {
   isPlayerKnockedOut?: boolean;
@@ -169,6 +170,12 @@ export class Overworld extends BaseScene {
 
     // Listen for battle start events
     EventBus.on('battle:start', this.handleBattleStart, this);
+
+    // Listen for battle completion events for auto-save
+    EventBus.on('battle:victory', this.handleBattleVictory, this);
+
+    // Listen for item collection events for auto-save
+    EventBus.on('item:collected', this.handleItemCollected, this);
 
     // Mark game as started
     const dataManager = this.registry.get('dataManager') as DataManager;
@@ -1024,6 +1031,16 @@ export class Overworld extends BaseScene {
     this.scene.pause(SceneKeys.WORLD);
   }
 
+  private handleBattleVictory(): void {
+    console.log('[Overworld:handleBattleVictory] Battle won, triggering auto-save');
+    saveService.autoSave();
+  }
+
+  private handleItemCollected(data: { itemId: number; itemName: string }): void {
+    console.log('[Overworld:handleItemCollected] Item collected, triggering auto-save');
+    saveService.autoSave();
+  }
+
   private getObjectProperty(object: any, propertyName: string): any {
     if (!object.properties || !Array.isArray(object.properties)) {
       return undefined;
@@ -1103,14 +1120,14 @@ export class Overworld extends BaseScene {
    * Handle save requests
    */
   private handleSaveRequest(): void {
-    const dataManager = this.registry.get('dataManager') as DataManager;
-    dataManager.saveData();
+    const success = saveService.saveGame(true);
     
-    // Emit save notification
-    EventBus.emit('hud:notification', {
-      message: 'Game saved!',
-      type: 'save'
-    });
+    if (!success) {
+      EventBus.emit('hud:notification', {
+        message: 'Failed to save game',
+        type: 'error'
+      });
+    }
     
     // Close menu after save
     if (this.worldMenu?.isOpen) {
@@ -1177,6 +1194,8 @@ export class Overworld extends BaseScene {
    */
   shutdown(): void {
     EventBus.off('battle:start', this.handleBattleStart, this);
+    EventBus.off('battle:victory', this.handleBattleVictory, this);
+    EventBus.off('item:collected', this.handleItemCollected, this);
     EventBus.off('hud:menu-toggle', this.handleMenuToggle, this);
     EventBus.off('scene:launch', this.handleSceneLaunch, this);
     EventBus.off('options:changed', this.handleOptionsChanged, this);

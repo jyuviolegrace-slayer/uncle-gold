@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { BaseScene } from './common/BaseScene';
 import { SceneKeys, TextureKeys, AudioKeys, FontKeys } from '../assets';
+import { saveService } from '../services/SaveService';
 
 const GAME_OVER_TEXT_STYLE: Phaser.Types.GameObjects.Text.TextStyle = {
   fontFamily: FontKeys.KENNEY_FUTURE_NARROW,
@@ -28,6 +29,9 @@ export class GameOver extends BaseScene {
     this.createGameOverScreen();
     this.setupTransitions();
     this.playGameOverMusic();
+    
+    // Save game state after blackout
+    saveService.autoSave();
   }
 
   update(time: number, delta: number): void {
