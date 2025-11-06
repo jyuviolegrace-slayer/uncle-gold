@@ -23,7 +23,7 @@ function App() {
         return () => window.removeEventListener('resize', handleWindowResize);
     }, []);
 
-    const showUI = ['Overworld', 'Battle', 'Party', 'Shop', 'Menu', 'HUD', 'Inventory', 'MonsterParty', 'MonsterDetails', 'Title', 'Options', 'GameOver', 'Champion'].includes(currentScene);
+    const showUI = [''].includes(currentScene);
 
     return (
         <div id="app">
