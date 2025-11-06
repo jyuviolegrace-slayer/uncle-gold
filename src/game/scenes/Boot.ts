@@ -1,3 +1,4 @@
+import Phaser from 'phaser';
 import { BaseScene } from './common/BaseScene';
 import { SceneKeys } from '../assets';
 
@@ -13,23 +14,27 @@ import { SceneKeys } from '../assets';
  */
 export class Boot extends BaseScene {
     constructor() {
-        super("Boot"); // Keep "Boot" as the scene key for transition
+        super('Boot'); // Keep "Boot" as the scene key for transition
     }
 
     create(): void {
         super.create();
-        
-        // Configure scale settings
+
         this.scale.scaleMode = Phaser.Scale.FIT;
         this.scale.autoCenter = Phaser.Scale.CENTER_BOTH;
-        
-        // Log boot completion
-        this.log('Boot scene completed - transitioning to Preloader');
-        
-        // Transition to Preloader scene
-        setTimeout(() => {
-            this.transitionToScene(SceneKeys.PRELOAD);
-        }, 100);
+
+        const handlePreloadComplete = () => {
+            if (this.scene.isActive(SceneKeys.PRELOAD)) {
+                this.scene.stop(SceneKeys.PRELOAD);
+            }
+
+            this.transitionToScene(SceneKeys.TITLE);
+        };
+
+        this.eventBus.once('preload-complete', handlePreloadComplete);
+
+        this.log('Boot scene launching Preloader and awaiting asset load completion');
+        this.scene.launch(SceneKeys.PRELOAD);
     }
 }
 
