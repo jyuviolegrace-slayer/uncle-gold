@@ -1,5 +1,6 @@
 import { BaseScene } from './common/BaseScene';
 import { SceneKeys } from '../assets/SceneKeys';
+import { TextureKeys } from '../assets/TextureKeys';
 import { EventBus } from '../EventBus';
 import { DataManager, DataManagerStoreKeys, BattleSceneOptions } from '../services/DataManager';
 import { 
@@ -123,7 +124,11 @@ export class Battle extends BaseScene {
     });
 
     // Create UI components
-    this.battleMenu = new BattleMenu(this, this.activePlayerMonster, this.skipAnimations);
+    this.battleMenu = new BattleMenu({
+      scene: this,
+      playerMonster: this.activePlayerMonster,
+      skipAnimations: this.skipAnimations
+    });
     this.attackManager = new AttackManager(this, this.skipAnimations);
     this.createAvailableMonstersUi();
     this.ball = new BattleBall({
@@ -140,17 +145,17 @@ export class Battle extends BaseScene {
     this.createBattleStateMachine();
 
     // Lock input initially
-    this.controls.lockInput = true;
+    this.inputManager.lockInput();
 
     // Start the battle
     this.battleStateMachine.setState(BattleState.INTRO);
   }
 
-  update(): void {
-    super.update();
+  update(time: number, delta: number): void {
+    super.update(time, delta);
     this.battleStateMachine.update();
 
-    if (this.controls.isInputLocked) {
+    if (this.inputManager.isInputLocked) {
       return;
     }
 
@@ -158,7 +163,7 @@ export class Battle extends BaseScene {
   }
 
   private handleInput(): void {
-    const wasSpaceKeyPressed = this.controls.wasSpaceKeyPressed();
+    const wasSpaceKeyPressed = this.inputManager.wasSpaceKeyPressed();
 
     // Handle input based on current state
     if (
@@ -180,12 +185,12 @@ export class Battle extends BaseScene {
         return;
       }
 
-      if (this.controls.wasBackKeyPressed()) {
+      if (this.inputManager.wasBackKeyPressed()) {
         this.battleMenu.handlePlayerInput('CANCEL');
         return;
       }
 
-      const selectedDirection = this.controls.getDirectionKeyJustPressed();
+      const selectedDirection = this.inputManager.getDirectionKeyJustPressed();
       if (selectedDirection !== 'NONE') {
         this.battleMenu.handlePlayerInput(selectedDirection as any);
       }
@@ -247,7 +252,7 @@ export class Battle extends BaseScene {
       onEnter: async () => {
         await this.activeEnemyMonster.showMonster();
         this.showMessage(`Wild ${this.activeEnemyMonster.getMonsterDetails().name} appeared!`);
-        this.controls.lockInput = false;
+        this.inputManager.unlockInput();
       }
     });
 
@@ -458,14 +463,14 @@ export class Battle extends BaseScene {
       if (monster.currentHp <= 0) return;
 
       const gainedExp = index === this.activePlayerMonsterPartyIndex ? gainedExpForActive : gainedExpForInactive;
-      const statChanges = handleMonsterGainingExperience(monster, gainedExp);
+      const statChanges = handleCritterGainingExperience(monster as CritterInstance, gainedExp);
       
       messages.push(`${monster.name} gained ${gainedExp} exp!`);
       
-      if (statChanges.level > 0) {
+      if (statChanges.statChanges.level > 0) {
         messages.push(
           `${monster.name} level increased to ${monster.currentLevel}!`,
-          `${monster.name} attack increased by ${statChanges.attack} and health increased by ${statChanges.health}`
+          `${monster.name} attack increased by ${statChanges.statChanges.attack} and health increased by ${statChanges.statChanges.health}`
         );
       }
     });
@@ -565,12 +570,12 @@ export class Battle extends BaseScene {
       return;
     }
 
-    this.controls.lockInput = true;
+    this.inputManager.lockInput();
     this.switchingActiveMonster = true;
 
     // Switch to selected monster
     this.switchToMonster(data.selectedMonsterIndex);
-    this.controls.lockInput = false;
+    this.inputManager.unlockInput();
   }
 
   /**

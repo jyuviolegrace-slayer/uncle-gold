@@ -126,6 +126,13 @@ export abstract class BaseScene extends Scene {
   }
 
   /**
+   * Handle scene shutdown
+   */
+  shutdown(): void {
+    this.handleSceneCleanup();
+  }
+
+  /**
    * Safe scene transition with error handling
    */
   protected transitionToScene(sceneKey: string, data?: any): void {
