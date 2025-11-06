@@ -91,7 +91,7 @@ export class EventZoneManager {
         const dataManager = this.scene.registry.get('dataManager') as DataManager;
         const currentGameFlags = dataManager.getFlags();
         const eventRequirementsMet = eventData.requires.every((flag) => {
-          return currentGameFlags.has(flag);
+          return currentGameFlags.has(flag as any);
         });
 
         if (eventRequirementsMet) {

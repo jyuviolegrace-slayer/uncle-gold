@@ -36,11 +36,11 @@ export class Item {
     };
   }
 
-  get itemItemId(): number {
+  get dataItemId(): number {
     return this.itemId;
   }
 
-  get itemId(): number {
+  get uniqueId(): number {
     return this.id;
   }
 

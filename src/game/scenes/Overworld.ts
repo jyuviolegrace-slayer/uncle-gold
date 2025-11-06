@@ -413,18 +413,18 @@ export class Overworld extends BaseScene {
 
     if (nearbyItem && nearbyItemIndex !== undefined) {
       // Add item to inventory and display message to player
-      const item = dataLoader.getLegacyItemById(nearbyItem.itemId);
+      const item = dataLoader.getLegacyItemById(nearbyItem.dataItemId);
       const dataManager = this.registry.get('dataManager') as DataManager;
 
       if (item) {
         dataManager.addLegacyItem(item, 1);
         nearbyItem.destroy();
         this.items.splice(nearbyItemIndex, 1);
-        dataManager.addItemPickedUp(nearbyItem.id);
+        dataManager.addItemPickedUp(nearbyItem.uniqueId);
 
         // Emit item collected event
         EventBus.emit('item:collected', {
-          itemId: nearbyItem.id,
+          itemId: nearbyItem.uniqueId,
           itemName: item.name
         });
 
@@ -501,6 +501,10 @@ export class Overworld extends BaseScene {
     const npcLayers = map.getObjectLayerNames().filter((layerName) => layerName.includes('NPC'));
     npcLayers.forEach((layerName) => {
       const layer = map.getObjectLayer(layerName);
+      if (!layer) {
+        return;
+      }
+
       const npcObject = layer.objects.find((obj) => {
         return obj.type === 'NPC';
       });
@@ -584,8 +588,8 @@ export class Overworld extends BaseScene {
       const item = new Item({
         scene: this,
         position: {
-          x: tiledItem.x,
-          y: tiledItem.y - TILE_SIZE,
+          x: tiledItem.x!,
+          y: tiledItem.y! - TILE_SIZE,
         },
         itemId,
         id,
@@ -644,8 +648,10 @@ export class Overworld extends BaseScene {
 
       encounterLayers.forEach((layerName) => {
         const layer = map.createLayer(layerName, encounterTiles, 0, 0);
-        layer.setAlpha(0).setDepth(2); // Set alpha to 0 for invisible encounter zones
-        this.encounterLayers.push(layer);
+        if (layer) {
+          layer.setAlpha(0).setDepth(2); // Set alpha to 0 for invisible encounter zones
+          this.encounterLayers.push(layer);
+        }
       });
     }
   }
@@ -727,7 +733,7 @@ export class Overworld extends BaseScene {
           object.visible = false;
         }
         
-        this.audioManager.playSoundEffect('GRASS');
+        this.audioManager.playSoundFx('GRASS');
         break;
       case 'NONE':
         break;
@@ -740,16 +746,17 @@ export class Overworld extends BaseScene {
     // Cleanup any special tiles that are not at the player's current position
     this.specialEncounterTileImageGameObjectGroup
       .getChildren()
-      .forEach((child: Phaser.GameObjects.Image) => {
-        if (!child.active) {
+      .forEach((child) => {
+        const imageChild = child as Phaser.GameObjects.Image;
+        if (!imageChild.active) {
           return;
         }
-        if (this.player && child.x === this.player.sprite.x && child.y === this.player.sprite.y) {
-          child.visible = true;
+        if (this.player && imageChild.x === this.player.sprite.x && imageChild.y === this.player.sprite.y) {
+          imageChild.visible = true;
           return;
         }
-        child.active = false;
-        child.visible = false;
+        imageChild.active = false;
+        imageChild.visible = false;
       });
   }
 
@@ -852,7 +859,7 @@ export class Overworld extends BaseScene {
     const dataManager = this.registry.get('dataManager') as DataManager;
     const currentGameFlags = dataManager.getFlags();
     const eventRequirementsMet = eventToHandle.requires.every((flag) => {
-      return currentGameFlags.has(flag);
+      return currentGameFlags.has(flag as any);
     });
     
     if (!eventRequirementsMet) {
@@ -913,5 +920,4 @@ export class Overworld extends BaseScene {
     const property = object.properties.find((prop: any) => prop.name === propertyName);
     return property?.value;
   }
-}
 }

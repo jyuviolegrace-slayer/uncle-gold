@@ -1,7 +1,7 @@
 import { Data } from "phaser";
 import { EventBus } from "../EventBus";
 import { Direction, GameFlag } from "../models/common";
-import { InventoryItem, LegacyInventoryItem } from "../models/item";
+import { InventoryItem, LegacyInventoryItem, LegacyItem } from "../models/item";
 import { CritterInstance } from "../models/critter";
 import { dataLoader } from "../data/DataLoader";
 

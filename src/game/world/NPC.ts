@@ -34,7 +34,7 @@ export class NPC extends Character {
   constructor(config: NpcConfig) {
     super({
       ...config,
-      assetKey: TextureKeys.CHARACTERS,
+      assetKey: TextureKeys.CHARACTER_NPC,
       origin: { x: 0, y: 0 },
       idleFrameConfig: {
         DOWN: config.frame,
