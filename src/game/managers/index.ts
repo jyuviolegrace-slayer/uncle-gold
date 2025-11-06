@@ -1,4 +1,5 @@
 /**
- * Managers barrel export - Placeholder for future game managers
+ * Managers barrel export - Game managers
  */
-// Placeholder for scene managers, state managers, etc.
+export { InputManager } from './InputManager';
+export type { InputState } from './InputManager';
