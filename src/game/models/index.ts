@@ -1,4 +1,10 @@
-/**
- * Models barrel export - Game data models
- */
-export type { ISaveData, ICharacter, IMonster, IItem } from './types';
+export * from './common';
+export * from './critter';
+export * from './move';
+export * from './item';
+export * from './encounter';
+export * from './npc';
+export * from './events';
+export * from './map';
+export * from './type';
+export * from './types';

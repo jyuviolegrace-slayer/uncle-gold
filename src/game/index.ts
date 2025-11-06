@@ -14,6 +14,9 @@ export * from './services';
 // Data models
 export * from './models';
 
+// Data loaders and registries
+export * from './data';
+
 // World systems (placeholder)
 // export * from './world';
 
