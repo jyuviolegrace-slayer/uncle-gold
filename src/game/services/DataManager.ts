@@ -275,6 +275,28 @@ export class DataManager extends Phaser.Events.EventEmitter {
         this.eventBus.emit("inventory:updated", inventory);
     }
 
+    addLegacyItem(item: LegacyItem, quantity: number): void {
+        const inventory = this.store.get(
+            DataManagerStoreKeys.INVENTORY
+        ) as LegacyInventoryItem[];
+        const existingItem = inventory.find((inventoryItem) => {
+            return inventoryItem.item.id === item.id;
+        });
+
+        if (existingItem) {
+            existingItem.quantity += quantity;
+        } else {
+            inventory.push({
+                item: {
+                    id: item.id,
+                },
+                quantity,
+            });
+        }
+        this.store.set(DataManagerStoreKeys.INVENTORY, inventory);
+        this.eventBus.emit("inventory:updated", inventory);
+    }
+
     addItemPickedUp(itemId: number): void {
         const itemsPickedUp =
             (this.store.get(

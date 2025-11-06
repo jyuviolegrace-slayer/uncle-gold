@@ -70,3 +70,18 @@ export function snapPositionToGrid(position: Coordinate): Coordinate {
     y: Math.round(position.y / TILE_SIZE) * TILE_SIZE,
   };
 }
+
+/**
+ * Get path from current position to target position for NPCs
+ * Returns array of coordinates to follow
+ */
+export function getTargetPathToGameObject(
+  currentPosition: Coordinate,
+  targetPosition: Coordinate
+): { pathToFollow: Coordinate[] } {
+  // Simple pathfinding - just return target position for now
+  // In a full implementation, this would use A* or similar algorithm
+  return {
+    pathToFollow: [targetPosition]
+  };
+}
