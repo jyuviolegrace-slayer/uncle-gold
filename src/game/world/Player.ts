@@ -28,6 +28,9 @@ export class Player extends Character {
       },
     });
     
+    // Set player depth to be above NPCs
+    this.sprite.setDepth(2);
+    
     this.entranceLayer = config.entranceLayer;
     this.enterEntranceCallback = config.enterEntranceCallback;
   }

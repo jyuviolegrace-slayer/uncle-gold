@@ -547,53 +547,68 @@ export class Overworld extends BaseScene {
         return;
       }
 
-      const npcObject = layer.objects.find((obj) => {
-        return obj.type === 'NPC';
-      });
+      // Handle both direct object layers and grouped layers
+      const layersToProcess: Phaser.Tilemaps.ObjectLayer[] = [layer];
       
-      if (!npcObject || npcObject.x === undefined || npcObject.y === undefined) {
-        return;
+      // If this is a group layer, also process its child layers
+      const layerAsAny = layer as any;
+      if (layerAsAny.layers && Array.isArray(layerAsAny.layers)) {
+        layersToProcess.push(...layerAsAny.layers);
       }
 
-      // Get the path objects for this NPC
-      const pathObjects = layer.objects.filter((obj) => {
-        return obj.type === 'NPC_PATH';
-      });
-      
-      const npcPath: Record<number, Coordinate> = {
-        0: { x: npcObject.x, y: npcObject.y - TILE_SIZE },
-      };
-      
-      pathObjects.forEach((obj) => {
-        if (obj.x === undefined || obj.y === undefined) {
+      layersToProcess.forEach((processLayer) => {
+        if (!processLayer.objects || processLayer.objects.length === 0) {
           return;
         }
-        npcPath[parseInt(obj.name || '0', 10)] = { x: obj.x, y: obj.y - TILE_SIZE };
+
+        const npcObject = processLayer.objects.find((obj) => {
+          return obj.type === 'NPC' || obj.type === 'npc';
+        });
+        
+        if (!npcObject || npcObject.x === undefined || npcObject.y === undefined) {
+          return;
+        }
+
+        // Get the path objects for this NPC
+        const pathObjects = processLayer.objects.filter((obj) => {
+          return obj.type === 'NPC_PATH' || obj.type === 'npc_path';
+        });
+        
+        const npcPath: Record<number, Coordinate> = {
+          0: { x: npcObject.x, y: npcObject.y - TILE_SIZE },
+        };
+        
+        pathObjects.forEach((obj) => {
+          if (obj.x === undefined || obj.y === undefined) {
+            return;
+          }
+          npcPath[parseInt(obj.name || '0', 10)] = { x: obj.x, y: obj.y - TILE_SIZE };
+        });
+
+        const npcMovement = this.getObjectProperty(npcObject, 'movement_pattern') || 'IDLE';
+        const npcId = this.getObjectProperty(npcObject, 'id');
+        const npcDetails = dataLoader.getNpcData(npcId);
+
+        if (!npcDetails) {
+          console.warn(`[Overworld:createNPCs] No NPC data found for ID: ${npcId}`);
+          return;
+        }
+
+        // In Tiled, the x value is how far the object starts from the left, and the y is the bottom of tiled object that is being added
+        const npc = new NPC({
+          scene: this,
+          position: { x: npcObject.x, y: npcObject.y - TILE_SIZE },
+          direction: Direction.DOWN,
+          frame: npcDetails.frame,
+          npcPath,
+          movementPattern: npcMovement as NpcMovementPattern,
+          events: npcDetails.events,
+          animationKeyPrefix: npcDetails.animationKeyPrefix,
+          id: npcId,
+        });
+        
+        this.npcs.push(npc);
       });
-
-      const npcMovement = this.getObjectProperty(npcObject, 'movement_pattern') || 'IDLE';
-      const npcId = this.getObjectProperty(npcObject, 'id');
-      const npcDetails = dataLoader.getNpcData(npcId);
-
-      if (!npcDetails) {
-        console.warn(`[Overworld:createNPCs] No NPC data found for ID: ${npcId}`);
-        return;
-      }
-
-      // In Tiled, the x value is how far the object starts from the left, and the y is the bottom of tiled object that is being added
-      const npc = new NPC({
-        scene: this,
-        position: { x: npcObject.x, y: npcObject.y - TILE_SIZE },
-        direction: Direction.DOWN,
-        frame: npcDetails.frame,
-        npcPath,
-        movementPattern: npcMovement as NpcMovementPattern,
-        events: npcDetails.events,
-        animationKeyPrefix: npcDetails.animationKeyPrefix,
-        id: npcId,
-      });
-      
-      this.npcs.push(npc);
     });
 
     // Update collisions with player
