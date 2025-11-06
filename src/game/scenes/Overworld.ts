@@ -10,6 +10,8 @@ import { dataLoader } from '../data/DataLoader';
 import { weightedRandom } from '../utils/weightedRandom';
 import { getTargetPositionFromGameObjectPositionAndDirection } from '../world/utils/gridUtils';
 import { WorldMenu } from '../ui/menu';
+import { Dialog, DialogSceneData } from './Dialog';
+import { Cutscene, CutsceneSceneData, CutsceneAction } from './Cutscene';
 
 export interface OverworldSceneData {
   isPlayerKnockedOut?: boolean;
@@ -418,9 +420,8 @@ export class Overworld extends BaseScene {
         textToShow = sign.message;
       }
       
-      // Show placeholder dialog for now - will be replaced with DialogScene in Ticket 11
-      console.log(`[Overworld:handlePlayerInteraction] Sign: ${textToShow}`);
-      EventBus.emit('dialog:show', [textToShow]);
+      // Launch dialog scene
+      this.launchDialogScene([textToShow]);
       return;
     }
 
@@ -463,9 +464,8 @@ export class Overworld extends BaseScene {
           itemName: item.name
         });
 
-        // Show placeholder dialog for now
-        console.log(`[Overworld:handlePlayerInteraction] Item found: ${item.name}`);
-        EventBus.emit('dialog:show', [`You found a ${item.name}`]);
+        // Launch dialog scene
+        this.launchDialogScene([`You found a ${item.name}`]);
       }
     }
   }
@@ -797,8 +797,16 @@ export class Overworld extends BaseScene {
 
   private startCutScene(): void {
     this.isProcessingCutSceneEvent = true;
-    // Placeholder for cutscene start - will be implemented in future tickets
     console.log(`[Overworld:startCutScene] Starting cutscene with ID: ${this.currentCutSceneId}`);
+    
+    if (this.currentCutSceneId !== undefined) {
+      this.launchCutsceneScene();
+      
+      // Wait for cutscene to start, then handle interaction
+      EventBus.once('cutscene:started', () => {
+        this.handleCutSceneInteraction();
+      });
+    }
   }
 
   private handleCutSceneInteraction(): void {
@@ -828,6 +836,14 @@ export class Overworld extends BaseScene {
       }
       
       this.currentCutSceneId = undefined;
+      
+      // End cutscene and resume world
+      const cutscene = this.scene.get(SceneKeys.CUTSCENE) as Cutscene;
+      if (cutscene) {
+        cutscene.endCutScene().then(() => {
+          this.scene.stop(SceneKeys.CUTSCENE);
+        });
+      }
       return;
     }
 
@@ -838,34 +854,51 @@ export class Overworld extends BaseScene {
 
     this.isProcessingCutSceneEvent = true;
     
-    // Handle different event types (placeholder for now)
+    // Handle different event types
     switch (eventType) {
       case GameEventType.ADD_NPC:
         console.log('[Overworld:handleCutSceneInteraction] ADD_NPC event');
+        // TODO: Implement NPC addition logic
+        this.handleCutSceneInteraction();
         break;
       case GameEventType.MOVE_TO_PLAYER:
         console.log('[Overworld:handleCutSceneInteraction] MOVE_TO_PLAYER event');
+        // TODO: Implement NPC movement to player logic
+        this.handleCutSceneInteraction();
         break;
       case GameEventType.RETRACE_PATH:
         console.log('[Overworld:handleCutSceneInteraction] RETRACE_PATH event');
+        // TODO: Implement path retrace logic
+        this.handleCutSceneInteraction();
         break;
       case GameEventType.REMOVE_NPC:
         console.log('[Overworld:handleCutSceneInteraction] REMOVE_NPC event');
+        // TODO: Implement NPC removal logic
+        this.handleCutSceneInteraction();
         break;
       case GameEventType.TALK_TO_PLAYER:
         console.log('[Overworld:handleCutSceneInteraction] TALK_TO_PLAYER event');
+        // TODO: Implement NPC talking logic - may launch dialog
+        this.handleCutSceneInteraction();
         break;
       case GameEventType.GIVE_MONSTER:
         console.log('[Overworld:handleCutSceneInteraction] GIVE_MONSTER event');
+        // TODO: Implement monster giving logic
+        this.handleCutSceneInteraction();
         break;
       case GameEventType.ADD_FLAG:
         console.log('[Overworld:handleCutSceneInteraction] ADD_FLAG event');
+        // TODO: Implement flag addition logic
+        this.handleCutSceneInteraction();
         break;
       case GameEventType.REMOVE_FLAG:
         console.log('[Overworld:handleCutSceneInteraction] REMOVE_FLAG event');
+        // TODO: Implement flag removal logic
+        this.handleCutSceneInteraction();
         break;
       default:
         console.warn(`[Overworld:handleCutSceneInteraction] Unknown event type: ${eventType}`);
+        this.handleCutSceneInteraction();
     }
   }
 
@@ -908,9 +941,12 @@ export class Overworld extends BaseScene {
     switch (eventType) {
       case NpcEventType.MESSAGE:
         console.log('[Overworld:handleNpcInteraction] MESSAGE event:', eventToHandle.data.messages);
-        EventBus.emit('dialog:show', eventToHandle.data.messages);
-        this.isProcessingNpcEvent = false;
-        this.handleNpcInteraction();
+        this.launchDialogScene(eventToHandle.data.messages);
+        // Listen for dialog completion
+        EventBus.once('dialog:closed', () => {
+          this.isProcessingNpcEvent = false;
+          this.handleNpcInteraction();
+        });
         break;
       case NpcEventType.HEAL:
         this.healPlayerParty();
@@ -1072,6 +1108,49 @@ export class Overworld extends BaseScene {
       this.worldMenu.hide();
       this.unlockInput();
     }
+  }
+
+  /**
+   * Launch the dialog scene with specified messages
+   * @param messages Array of messages to display
+   */
+  private launchDialogScene(messages: string[]): void {
+    const dialogData: DialogSceneData = {
+      messages
+    };
+    
+    this.scene.launch(SceneKeys.DIALOG, dialogData);
+    this.scene.pause(SceneKeys.WORLD);
+  }
+
+  /**
+   * Launch the cutscene scene
+   */
+  private launchCutsceneScene(): void {
+    this.scene.launch(SceneKeys.CUTSCENE);
+    this.scene.pause(SceneKeys.WORLD);
+  }
+
+  /**
+   * Execute a cutscene with actions
+   * @param actions Array of cutscene actions to execute
+   * @param onComplete Optional callback when cutscene is complete
+   */
+  private async executeCutscene(actions: CutsceneAction[], onComplete?: () => void): Promise<void> {
+    this.launchCutsceneScene();
+    
+    // Wait for cutscene to start, then execute sequence
+    EventBus.once('cutscene:started', async () => {
+      const cutscene = this.scene.get(SceneKeys.CUTSCENE) as Cutscene;
+      if (cutscene) {
+        await cutscene.executeCutsceneSequence(actions);
+      }
+      if (onComplete) {
+        onComplete();
+      }
+      this.scene.resume(SceneKeys.WORLD);
+      this.scene.stop(SceneKeys.CUTSCENE);
+    });
   }
 
   /**
