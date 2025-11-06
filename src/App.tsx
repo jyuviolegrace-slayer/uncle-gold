@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { IRefPhaserGame, PhaserGame } from './PhaserGame';
 import HUD from './components/HUD';
 import MobileControls from './components/MobileControls';
+import { SceneKeys } from './game/assets';
 
 function App() {
     const phaserRef = useRef<IRefPhaserGame | null>(null);
@@ -23,7 +24,20 @@ function App() {
         return () => window.removeEventListener('resize', handleWindowResize);
     }, []);
 
-    const showUI = [''].includes(currentScene);
+    // Show UI for gameplay scenes, hide for boot/preloader/title
+    const showUI = [
+        SceneKeys.WORLD,
+        SceneKeys.BATTLE,
+        SceneKeys.OPTIONS,
+        SceneKeys.MONSTER_PARTY,
+        SceneKeys.MONSTER_DETAILS,
+        SceneKeys.INVENTORY,
+        SceneKeys.SHOP,
+        SceneKeys.MENU,
+        SceneKeys.CHAMPION,
+        SceneKeys.DIALOG,
+        SceneKeys.CUTSCENE
+    ].includes(currentScene as SceneKeys);
 
     return (
         <div id="app">

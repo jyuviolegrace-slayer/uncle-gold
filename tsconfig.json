@@ -20,6 +20,15 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@game/*": [
+        "./src/game/*"
+      ],
+      "@assets/*": [
+        "./src/game/assets/*"
+      ],
+      "@data/*": [
+        "./src/game/data/*"
       ]
     },
     "target": "ES2017"
