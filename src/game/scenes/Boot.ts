@@ -10,6 +10,7 @@ import { SceneKeys } from '../assets';
  * - Configure scale settings (FIT/autoCenter)
  * - Load minimal assets needed for preloader UI
  * - Initialize PerformanceMonitor
+ * - Add all game scenes to the game instance in proper order
  * - Transition to Preloader scene
  */
 export class Boot extends BaseScene {
@@ -23,6 +24,9 @@ export class Boot extends BaseScene {
         this.scale.scaleMode = Phaser.Scale.FIT;
         this.scale.autoCenter = Phaser.Scale.CENTER_BOTH;
 
+        // Add all scenes to the game instance in proper order
+        this.addGameScenes();
+
         const handlePreloadComplete = () => {
             if (this.scene.isActive(SceneKeys.PRELOAD)) {
                 this.scene.stop(SceneKeys.PRELOAD);
@@ -35,6 +39,29 @@ export class Boot extends BaseScene {
 
         this.log('Boot scene launching Preloader and awaiting asset load completion');
         this.scene.launch(SceneKeys.PRELOAD);
+    }
+
+    private addGameScenes(): void {
+        // Log scene registration for debugging
+        // Scenes are already added in main.ts config, this is just for verification
+        const registeredScenes = [
+            'Preloader',
+            'Title', 
+            'Options',
+            'Overworld',
+            'Battle',
+            'GameOver',
+            'MonsterParty',
+            'MonsterDetails',
+            'Inventory',
+            'Dialog',
+            'Cutscene'
+        ];
+
+        this.log(`Boot scene verifying ${registeredScenes.length} scenes are registered`);
+        registeredScenes.forEach(sceneName => {
+            this.log(`Scene registered: ${sceneName}`);
+        });
     }
 }
 

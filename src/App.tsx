@@ -24,11 +24,10 @@ function App() {
         return () => window.removeEventListener('resize', handleWindowResize);
     }, []);
 
-    // Show UI for gameplay scenes, hide for boot/preloader/title
+    // Show UI for gameplay scenes, hide for boot/preloader/title/options/gameover
     const showUI = [
         SceneKeys.WORLD,
         SceneKeys.BATTLE,
-        SceneKeys.OPTIONS,
         SceneKeys.MONSTER_PARTY,
         SceneKeys.MONSTER_DETAILS,
         SceneKeys.INVENTORY,

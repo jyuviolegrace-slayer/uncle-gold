@@ -9,8 +9,10 @@ import {
     dataAssets,
     fontAssets,
     WebFontFileLoader,
+    LegacyDataKeys,
 } from '../assets';
 import { dataLoader } from '../data';
+import { dataManager } from '../services/DataManager';
 
 export class Preloader extends BaseScene {
     private progressBar?: Phaser.GameObjects.Graphics;
@@ -49,12 +51,23 @@ export class Preloader extends BaseScene {
         }
 
         try {
+            // Create animations from legacy animations data
+            this.createAnimations();
+            
+            // Initialize data loader with cached data
             await dataLoader.loadFromCache(this.cache);
+            
+            // Initialize data manager (mirrors archive's dataManager.loadData())
+            this.initializeDataManager();
+            
+            // Set global audio settings based on data manager
+            this.updateGlobalSoundSettings();
+            
             if (this.progressText) {
                 this.progressText.setText('Loading Complete');
             }
         } catch (error) {
-            console.error('Failed to initialize data loader:', error);
+            console.error('Failed to initialize game systems:', error);
             if (this.progressText) {
                 this.progressText.setText('Error loading data');
             }
@@ -144,5 +157,36 @@ export class Preloader extends BaseScene {
         fontAssets.forEach((descriptor) => {
             this.load.addFile(new WebFontFileLoader(this.load, descriptor));
         });
+    }
+
+    private createAnimations(): void {
+        const animations = this.cache.json.get(LegacyDataKeys.LEGACY_ANIMATIONS);
+        if (!animations) {
+            console.warn('No animations data found');
+            return;
+        }
+
+        animations.forEach((animation: any) => {
+            const frames = animation.frames
+                ? this.anims.generateFrameNumbers(animation.assetKey, { frames: animation.frames })
+                : this.anims.generateFrameNumbers(animation.assetKey);
+            
+            this.anims.create({
+                key: animation.key,
+                frames: frames,
+                frameRate: animation.frameRate,
+                repeat: animation.repeat,
+                delay: animation.delay,
+                yoyo: animation.yoyo,
+            });
+        });
+    }
+
+    private initializeDataManager(): void {
+        dataManager.loadData();
+    }
+
+    private updateGlobalSoundSettings(): void {
+        this.audioManager.updateGlobalSoundSettings();
     }
 }

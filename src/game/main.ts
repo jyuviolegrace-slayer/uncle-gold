@@ -1,4 +1,4 @@
-import { Boot, Preloader, Title, Overworld, Battle, Options } from "./scenes";
+import { Boot, Preloader, Title, Overworld, Battle, Options, GameOver } from "./scenes";
 import { SceneKeys } from "./assets";
 import { AUTO, Game } from "phaser";
 
@@ -27,9 +27,10 @@ const config: Phaser.Types.Core.GameConfig = {
         Boot,
         Preloader,
         Title,
+        Options,
         Overworld,
         Battle,
-        Options
+        GameOver
     ],
 };
 
