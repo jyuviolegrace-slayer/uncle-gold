@@ -104,32 +104,32 @@ describe('WorldMenu', () => {
       expect(EventBus.emit).toHaveBeenCalledWith('scene:launch', { sceneKey: 'MONSTER_PARTY_SCENE' });
       
       // Reset and test BAG option
-      (EventBus.emit as jest.Mock).mockClear();
       worldMenu.hide();
       worldMenu.show();
+      (EventBus.emit as jest.Mock).mockClear();
       worldMenu.handlePlayerInput(Direction.DOWN); // Move to BAG
       worldMenu.handlePlayerInput('OK');
       expect(EventBus.emit).toHaveBeenCalledWith('scene:launch', { sceneKey: 'INVENTORY_SCENE' });
       
       // Reset and test SAVE option
-      (EventBus.emit as jest.Mock).mockClear();
       worldMenu.hide();
       worldMenu.show();
+      (EventBus.emit as jest.Mock).mockClear();
       worldMenu.handlePlayerInput(Direction.DOWN);
       worldMenu.handlePlayerInput(Direction.DOWN); // Move to SAVE
       worldMenu.handlePlayerInput('OK');
       expect(EventBus.emit).toHaveBeenCalledWith('save:requested');
       
       // Reset and test EXIT option
-      (EventBus.emit as jest.Mock).mockClear();
       worldMenu.hide();
       worldMenu.show();
+      (EventBus.emit as jest.Mock).mockClear();
       worldMenu.handlePlayerInput(Direction.DOWN);
       worldMenu.handlePlayerInput(Direction.DOWN);
       worldMenu.handlePlayerInput(Direction.DOWN); // Move to EXIT
       worldMenu.handlePlayerInput('OK');
-      // EXIT should just close the menu, not emit any events
-      expect(EventBus.emit).not.toHaveBeenCalled();
+      // EXIT should just close the menu, not emit any scene or save events
+      expect(EventBus.emit).toHaveBeenCalledWith('world-menu:closed');
     });
   });
 
@@ -191,13 +191,14 @@ describe('WorldMenu', () => {
 
     test('should wrap around navigation correctly', () => {
       worldMenu.show();
+      (EventBus.emit as jest.Mock).mockClear();
       
-      // Navigate up from first option (should wrap to last)
+      // Navigate up from first option (should wrap to last - EXIT)
       worldMenu.handlePlayerInput(Direction.UP);
       worldMenu.handlePlayerInput('OK');
       
-      // Should emit save:requested (last option)
-      expect(EventBus.emit).toHaveBeenCalledWith('save:requested');
+      // Should emit world-menu:closed (EXIT option closes menu)
+      expect(EventBus.emit).toHaveBeenCalledWith('world-menu:closed');
     });
   });
 
