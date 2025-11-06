@@ -45,8 +45,24 @@ describe('DataManager', () => {
 
     test('should update entire inventory', () => {
       const newInventory = [
-        { item: { id: '10' }, quantity: 2 },
-        { item: { id: '20' }, quantity: 1 },
+        { 
+          item: { 
+            id: '10', 
+            name: 'Test Item 10', 
+            description: 'Test description', 
+            type: 'item' 
+          }, 
+          quantity: 2 
+        },
+        { 
+          item: { 
+            id: '20', 
+            name: 'Test Item 20', 
+            description: 'Test description', 
+            type: 'item' 
+          }, 
+          quantity: 1 
+        },
       ];
       
       testManager.updateInventory(newInventory);

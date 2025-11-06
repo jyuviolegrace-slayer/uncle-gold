@@ -1,5 +1,5 @@
-import Phaser from 'phaser';
-import { BaseScene } from './common/BaseScene';
+import Phaser from "phaser";
+import { BaseScene } from "./common/BaseScene";
 import {
     SceneKeys,
     imageAssets,
@@ -9,14 +9,21 @@ import {
     dataAssets,
     fontAssets,
     WebFontFileLoader,
-} from '../assets';
-import { dataLoader } from '../data';
+    LegacyDataKeys,
+} from "../assets";
+import { dataLoader } from "../data";
+import { dataManager } from "../services/DataManager";
 
 export class Preloader extends BaseScene {
     private progressBar?: Phaser.GameObjects.Graphics;
     private progressBox?: Phaser.GameObjects.Graphics;
     private progressText?: Phaser.GameObjects.Text;
-    private progressBounds?: { x: number; y: number; width: number; height: number };
+    private progressBounds?: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    };
 
     private readonly onLoadProgress = (value: number) => {
         if (!this.progressBar || !this.progressBounds || !this.progressText) {
@@ -29,11 +36,11 @@ export class Preloader extends BaseScene {
         this.progressBar.fillRect(x, y, width * value, height);
 
         this.progressText.setText(`Loading... ${Math.round(value * 100)}%`);
-        this.eventBus.emit('preload-progress', value);
+        this.eventBus.emit("preload-progress", value);
     };
 
     private readonly onFileProgress = (file: Phaser.Loader.File) => {
-        this.eventBus.emit('preload-file', { key: file.key, type: file.type });
+        this.eventBus.emit("preload-file", { key: file.key, type: file.type });
     };
 
     private readonly onLoadComplete = async () => {
@@ -45,22 +52,33 @@ export class Preloader extends BaseScene {
         }
 
         if (this.progressText) {
-            this.progressText.setText('Initializing Data...');
+            this.progressText.setText("Initializing Data...");
         }
 
         try {
+            // Create animations from legacy animations data
+            this.createAnimations();
+
+            // Initialize data loader with cached data
             await dataLoader.loadFromCache(this.cache);
+
+            // Initialize data manager (mirrors archive's dataManager.loadData())
+            this.initializeDataManager();
+
+            // Set global audio settings based on data manager
+            this.updateGlobalSoundSettings();
+
             if (this.progressText) {
-                this.progressText.setText('Loading Complete');
+                // this.progressText.setText('Loading Complete');
             }
         } catch (error) {
-            console.error('Failed to initialize data loader:', error);
+            console.error("Failed to initialize game systems:", error);
             if (this.progressText) {
-                this.progressText.setText('Error loading data');
+                this.progressText.setText("Error loading data");
             }
         }
 
-        this.eventBus.emit('preload-progress', 1);
+        this.eventBus.emit("preload-progress", 1);
     };
 
     constructor() {
@@ -82,7 +100,7 @@ export class Preloader extends BaseScene {
         this.progressBox?.destroy();
         this.progressText?.destroy();
 
-        this.eventBus.emit('preload-complete');
+        this.eventBus.emit("preload-complete");
     }
 
     private createLoadingUi(): void {
@@ -94,29 +112,35 @@ export class Preloader extends BaseScene {
 
         this.progressBox = this.add.graphics();
         this.progressBox.fillStyle(0x1c1c1c, 0.85);
-        this.progressBox.fillRoundedRect(x - 8, y - 8, barWidth + 16, barHeight + 16, 12);
+        this.progressBox.fillRoundedRect(
+            x - 8,
+            y - 8,
+            barWidth + 16,
+            barHeight + 16,
+            12
+        );
 
         this.progressBar = this.add.graphics();
         this.progressBounds = { x, y, width: barWidth, height: barHeight };
 
         this.progressText = this.add
-            .text(width / 2, y + barHeight + 32, 'Loading... 0%', {
-                color: '#ffffff',
-                fontSize: '18px',
-                fontFamily: 'sans-serif',
+            .text(width / 2, y + barHeight + 32, "Loading... 0%", {
+                color: "#ffffff",
+                fontSize: "18px",
+                fontFamily: "sans-serif",
             })
             .setOrigin(0.5);
     }
 
     private registerLoadEvents(): void {
-        this.load.on('progress', this.onLoadProgress);
-        this.load.on('fileprogress', this.onFileProgress);
-        this.load.once('complete', this.onLoadComplete);
+        this.load.on("progress", this.onLoadProgress);
+        this.load.on("fileprogress", this.onFileProgress);
+        this.load.once("complete", this.onLoadComplete);
 
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-            this.load.off('progress', this.onLoadProgress);
-            this.load.off('fileprogress', this.onFileProgress);
-            this.load.off('complete', this.onLoadComplete);
+            this.load.off("progress", this.onLoadProgress);
+            this.load.off("fileprogress", this.onFileProgress);
+            this.load.off("complete", this.onLoadComplete);
         });
     }
 
@@ -145,4 +169,40 @@ export class Preloader extends BaseScene {
             this.load.addFile(new WebFontFileLoader(this.load, descriptor));
         });
     }
+
+    private createAnimations(): void {
+        const animations = this.cache.json.get(
+            LegacyDataKeys.LEGACY_ANIMATIONS
+        );
+        if (!animations) {
+            console.warn("No animations data found");
+            return;
+        }
+
+        animations.forEach((animation: any) => {
+            const frames = animation.frames
+                ? this.anims.generateFrameNumbers(animation.assetKey, {
+                      frames: animation.frames,
+                  })
+                : this.anims.generateFrameNumbers(animation.assetKey);
+
+            this.anims.create({
+                key: animation.key,
+                frames: frames,
+                frameRate: animation.frameRate,
+                repeat: animation.repeat,
+                delay: animation.delay,
+                yoyo: animation.yoyo,
+            });
+        });
+    }
+
+    private initializeDataManager(): void {
+        dataManager.loadData();
+    }
+
+    private updateGlobalSoundSettings(): void {
+        this.audioManager.updateGlobalSoundSettings();
+    }
 }
+
