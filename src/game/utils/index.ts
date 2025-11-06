@@ -61,3 +61,15 @@ export {
   calculateMaxLevelStats,
 } from './leveling-utils';
 export type { StatChanges, LevelUpResults } from './leveling-utils';
+
+// Text utilities
+export {
+  animateText,
+  CANNOT_READ_SIGN_TEXT,
+  SAMPLE_TEXT,
+  LONG_SAMPLE_TEXT,
+} from './text-utils';
+export type { AnimateTextConfig } from './text-utils';
+
+// Guard utilities
+export { exhaustiveGuard } from './guard';

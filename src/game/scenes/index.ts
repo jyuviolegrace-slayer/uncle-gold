@@ -11,4 +11,6 @@ export { GameOver } from './GameOver';
 export { InventoryScene } from './Inventory';
 export { MonsterPartyScene } from './MonsterParty';
 export { MonsterDetailsScene } from './MonsterDetails';
+export { Dialog } from './Dialog';
+export { Cutscene, type CutsceneAction } from './Cutscene';
 export { BaseScene } from './common/BaseScene';
