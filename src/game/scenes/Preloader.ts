@@ -10,6 +10,7 @@ import {
     fontAssets,
     WebFontFileLoader,
 } from '../assets';
+import { dataLoader } from '../data';
 
 export class Preloader extends BaseScene {
     private progressBar?: Phaser.GameObjects.Graphics;
@@ -35,7 +36,7 @@ export class Preloader extends BaseScene {
         this.eventBus.emit('preload-file', { key: file.key, type: file.type });
     };
 
-    private readonly onLoadComplete = () => {
+    private readonly onLoadComplete = async () => {
         if (this.progressBar && this.progressBounds) {
             const { x, y, width, height } = this.progressBounds;
             this.progressBar.clear();
@@ -44,7 +45,19 @@ export class Preloader extends BaseScene {
         }
 
         if (this.progressText) {
-            this.progressText.setText('Loading Complete');
+            this.progressText.setText('Initializing Data...');
+        }
+
+        try {
+            await dataLoader.loadFromCache(this.cache);
+            if (this.progressText) {
+                this.progressText.setText('Loading Complete');
+            }
+        } catch (error) {
+            console.error('Failed to initialize data loader:', error);
+            if (this.progressText) {
+                this.progressText.setText('Error loading data');
+            }
         }
 
         this.eventBus.emit('preload-progress', 1);
