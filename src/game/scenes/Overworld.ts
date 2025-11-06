@@ -163,6 +163,9 @@ export class Overworld extends BaseScene {
       isInterior: this.sceneData.isInterior,
     });
 
+    // Listen for battle start events
+    EventBus.on('battle:start', this.handleBattleStart, this);
+
     // Mark game as started
     const dataManager = this.registry.get('dataManager') as DataManager;
     dataManager.dataStore.set(DataManagerStoreKeys.GAME_STARTED, true);
@@ -912,6 +915,38 @@ export class Overworld extends BaseScene {
     });
   }
 
+  private handleBattleStart(data: { enemyMonsterId: number; areaId: string }): void {
+    console.log('[Overworld:handleBattleStart] Starting battle with data:', data);
+    
+    const dataManager = this.registry.get('dataManager') as DataManager;
+    const playerMonsters = dataManager.dataStore.get(DataManagerStoreKeys.CRITTERS_IN_PARTY) || [];
+    
+    if (playerMonsters.length === 0) {
+      console.error('[Overworld:handleBattleStart] No monsters in player party');
+      return;
+    }
+
+    // Get enemy monster data
+    const enemyMonster = dataLoader.getLegacyMonsterById(data.enemyMonsterId);
+    if (!enemyMonster) {
+      console.error(`[Overworld:handleBattleStart] No monster data found for ID: ${data.enemyMonsterId}`);
+      return;
+    }
+
+    // Create battle scene data
+    const battleData = {
+      playerMonsters,
+      enemyMonsters: [enemyMonster],
+      enemyMonsterId: data.enemyMonsterId,
+      areaId: data.areaId,
+      isTrainerBattle: false
+    };
+
+    // Launch battle scene
+    this.scene.launch(SceneKeys.BATTLE, battleData);
+    this.scene.pause(SceneKeys.WORLD);
+  }
+
   private getObjectProperty(object: any, propertyName: string): any {
     if (!object.properties || !Array.isArray(object.properties)) {
       return undefined;
@@ -919,5 +954,13 @@ export class Overworld extends BaseScene {
     
     const property = object.properties.find((prop: any) => prop.name === propertyName);
     return property?.value;
+  }
+
+  /**
+   * Clean up event listeners
+   */
+  shutdown(): void {
+    EventBus.off('battle:start', this.handleBattleStart, this);
+    super.shutdown();
   }
 }
