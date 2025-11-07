@@ -162,6 +162,9 @@ if (typeof HTMLCanvasElement !== 'undefined') {
 
 // Mock Phaser global namespace
 (global as any).Phaser = {
+  Math: {
+    Between: jest.fn((min: number, max: number) => (min + max) / 2),
+  },
   Input: {
     Keyboard: {
       KeyCodes: {

@@ -50,7 +50,8 @@ export class NPC extends Character {
     this.currentPathIndex = 0;
     this.movementPattern = config.movementPattern;
     this.lastMovementTime = Phaser.Math.Between(3500, 5000);
-    this.sprite.setScale(4);
+    this.phaserGameObject.setScale(4);
+    this.phaserGameObject.setDepth(1); // Ensure NPCs render above ground but below UI
     this.events = config.events;
     this.animationKeyPrefix = config.animationKeyPrefix;
     this.id = config.id;
